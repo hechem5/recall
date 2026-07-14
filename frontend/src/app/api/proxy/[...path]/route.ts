@@ -14,7 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ path
 
     console.log(`[Proxy GET] Fetching ${backendUrl}`);
     const res = await fetch(backendUrl, {
-      headers: { "Authorization": `Bearer ${process.env.APP_PASSWORD}` }
+      headers: { "Authorization": `Bearer ${session.token}` }
     });
     
     // Create new headers to pass back the content type and length
@@ -41,7 +41,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pat
     
     // Copy headers and add Authorization
     const headers = new Headers(request.headers);
-    headers.set("Authorization", `Bearer ${process.env.APP_PASSWORD}`);
+    headers.set("Authorization", `Bearer ${session.token}`);
     
     // Remove host header to prevent backend confusion
     headers.delete("host");
