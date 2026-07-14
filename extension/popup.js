@@ -32,8 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.openOptionsPage();
   });
 
-  // Save Tab
-  saveTabBtn.addEventListener('click', async () => {
+  // Open Options Page
+  const optionsBtn = document.getElementById('optionsBtn');
+  if (optionsBtn) {
+    optionsBtn.addEventListener('click', () => {
+      chrome.runtime.openOptionsPage();
+    });
+  }
+
+  // Save Current Tab
+  document.getElementById('saveTabBtn').addEventListener('click', async () => {
     saveTabBtn.disabled = true;
     saveStatus.textContent = 'SAVING...';
     saveStatus.classList.remove('hidden');

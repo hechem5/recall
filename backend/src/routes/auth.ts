@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.SESSION_SECRET || "fallback-secret-key-for-jwt";
 // Global IP-based rate limiter for the recovery code path
 const recoveryLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // Limit each IP to 5 recovery attempts per window
+  max: 100, // Limit each IP to 100 recovery attempts per window
   message: { error: "Too many recovery attempts from this IP, please try again after an hour" },
   skip: (req) => {
     // Skip rate limiting if they aren't trying to use a recovery code
