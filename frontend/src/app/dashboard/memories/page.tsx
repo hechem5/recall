@@ -139,7 +139,7 @@ export default function MemoriesPage() {
                     )}
                   </div>
                   <div className="text-xs text-[#737373] mt-2 italic">
-                    Saved: {new Date(memory.createdAt).toLocaleString()}
+                    Saved: {new Date(memory.createdAt).toLocaleString("en-GB", { timeZone: "Africa/Tunis", dateStyle: "medium", timeStyle: "short" })}
                   </div>
                 </div>
                 
