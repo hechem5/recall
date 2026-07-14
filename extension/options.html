@@ -73,11 +73,23 @@
             [ Create New ]
           </button>
         </div>
-        <span id="statusMessage" class="text-xs text-[#FF3366] tracking-widest uppercase hidden break-words leading-relaxed">
-          Settings Saved!
-        </span>
+        <span id="statusMessage" class="text-xs text-[#FF3366] tracking-widest uppercase hidden break-words leading-relaxed"></span>
       </div>
     </form>
+
+    <!-- Success Screen (Hidden by default) -->
+    <div id="successScreen" class="hidden flex-col items-center justify-center text-center space-y-6 pt-8">
+      <div class="text-4xl">🔒</div>
+      <h2 class="text-xl font-bold tracking-widest uppercase text-[#E5E5E5]">Vault Unlocked<br>& Device Trusted</h2>
+      <p class="text-[#737373] text-sm leading-relaxed max-w-xs">
+        Your Recall extension is now permanently synced with your vault.
+      </p>
+      <div class="pt-4 border-t border-[#262626] w-full">
+        <p class="text-[#FF3366] text-xs font-bold tracking-widest uppercase">
+          You can safely close this page.
+        </p>
+      </div>
+    </div>
   </div>
 
   <!-- Recovery Codes Modal -->

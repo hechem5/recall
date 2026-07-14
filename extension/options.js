@@ -149,10 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
         appPassword: password,
         deviceToken: data.deviceToken
       }, () => {
-        currentDeviceToken = data.deviceToken;
-        if (recoveryCodeGroup) recoveryCodeGroup.classList.add('hidden');
-        if (recoveryCodeInput) recoveryCodeInput.value = "";
-        showStatus('Vault Unlocked & Device Trusted!');
+        // Hide the form and show the success screen
+        form.classList.add('hidden');
+        document.getElementById('successScreen').classList.remove('hidden');
+        document.getElementById('successScreen').classList.add('flex');
       });
     } catch (err) {
       showStatus(`ERROR: ${err.message}`, true);
