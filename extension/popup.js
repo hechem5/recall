@@ -72,8 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!res.ok) throw new Error("Failed to save");
+      const data = await res.json();
       
-      saveStatus.textContent = 'SAVED SUCCESSFULLY';
+      if (data.alreadySaved) {
+        saveStatus.textContent = 'ALREADY SAVED';
+      } else {
+        saveStatus.textContent = 'SAVED SUCCESSFULLY';
+      }
       setTimeout(() => { saveStatus.classList.add('hidden'); saveTabBtn.disabled = false; }, 2000);
     } catch (e) {
       saveStatus.textContent = 'ERROR SAVING';
@@ -107,6 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Strip brackets like [1], [1, 2], [Source 1]
       let cleanAnswer = data.answer.replace(/[ \t]*\[(?:Sources?\s*)?[\d,\s]+\]/g, "");
+      // Clean up orphaned commas left behind
+      cleanAnswer = cleanAnswer.replace(/(,\s*)+,/g, ",");
+      cleanAnswer = cleanAnswer.replace(/(,\s*)+\./g, ".");
+      cleanAnswer = cleanAnswer.replace(/,\s*$/g, "");
       
       // Render markdown
       answerContent.innerHTML = marked.parse(cleanAnswer);
@@ -119,7 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
           div.className = 'border border-[#262626] p-2 bg-[#0A0A0A] hover:border-[#FF3366] transition-colors truncate';
           
           if (source.url) {
-            div.innerHTML = `<a href="${source.url}" target="_blank" class="text-xs text-[#E5E5E5] hover:text-[#FF3366] underline decoration-[#262626] hover:decoration-[#FF3366] transition-colors">${source.title || source.url}</a>`;
+            const a = document.createElement('a');
+            a.href = source.url;
+            a.textContent = source.title || source.url;
+            a.className = "text-xs text-[#E5E5E5] hover:text-[#FF3366] underline decoration-[#262626] hover:decoration-[#FF3366] transition-colors cursor-pointer";
+            a.addEventListener('click', (ev) => {
+              ev.preventDefault();
+              chrome.tabs.create({ url: source.url });
+            });
+            div.appendChild(a);
           } else {
             div.innerHTML = `<span class="text-xs text-[#E5E5E5]">${source.title || 'Note/Document'}</span>`;
           }

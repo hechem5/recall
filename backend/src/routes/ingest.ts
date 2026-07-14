@@ -127,6 +127,13 @@ router.post('/', upload.single('file'), async (req, res) => {
     }
 
     if (type === 'url') {
+      const existing = await prisma.source.findFirst({
+        where: { safeId, originalUrl: content }
+      });
+      if (existing) {
+        return res.json({ success: true, source: existing, alreadySaved: true });
+      }
+
       let extractedText = req.body.preExtractedText;
       let pageTitle = title;
 

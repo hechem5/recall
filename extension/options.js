@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const appPasswordInput = document.getElementById('appPassword');
   const recoveryCodeGroup = document.getElementById('recoveryCodeGroup');
   const recoveryCodeInput = document.getElementById('recoveryCode');
+
+  // Auto-format recovery code with hyphens (e.g. XXXX-XXXX-XXXX)
+  if (recoveryCodeInput) {
+    recoveryCodeInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      let formatted = '';
+      for (let i = 0; i < val.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += '-';
+        formatted += val[i];
+      }
+      e.target.value = formatted.substring(0, 14); // 12 chars + 2 hyphens
+    });
+  }
   const statusMessage = document.getElementById('statusMessage');
   const createNewBtn = document.getElementById('create-new-btn');
   

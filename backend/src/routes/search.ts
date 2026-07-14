@@ -41,28 +41,42 @@ router.get('/', async (req, res) => {
       return res.json({ answer: "I couldn't find anything related to that in your memory.", sources: [] });
     }
 
-    // Map vector results for synthesis
-    const contextChunks = results.map(r => ({
-      sourceId: r.sourceId,
-      content: r.content,
-      title: r.title,
-      url: r.originalUrl,
-      type: r.type,
-      savedAt: r.createdAt ? new Date(r.createdAt).toLocaleString() : undefined,
-    }));
+    const sourceMap = new Map();
 
-    const recentContext = recentSources.map(r => ({
-      sourceId: r.id,
-      content: r.rawText ? r.rawText.substring(0, 500) : '',
-      title: r.title,
-      url: r.originalUrl,
-      type: r.type,
-      savedAt: r.createdAt ? new Date(r.createdAt).toLocaleString() : undefined,
-      isRecent: true
-    }));
+    // Add recent sources first so they are at the top and clearly marked
+    recentSources.forEach(r => {
+      sourceMap.set(r.id, {
+        sourceId: r.id,
+        content: r.rawText ? r.rawText.substring(0, 800) : '',
+        title: r.title,
+        url: r.originalUrl,
+        type: r.type,
+        savedAt: r.createdAt ? new Date(r.createdAt).toLocaleString() : undefined,
+        isRecent: true
+      });
+    });
 
-    // Combine them into a single list with a single numbering system to prevent LLM citation confusion
-    const combinedSources = [...contextChunks, ...recentContext];
+    // Add context chunks, grouping by source
+    results.forEach(r => {
+      if (!sourceMap.has(r.sourceId)) {
+        sourceMap.set(r.sourceId, {
+          sourceId: r.sourceId,
+          content: '',
+          title: r.title,
+          url: r.originalUrl,
+          type: r.type,
+          savedAt: r.createdAt ? new Date(r.createdAt).toLocaleString() : undefined,
+          isRecent: false
+        });
+      }
+      const source = sourceMap.get(r.sourceId);
+      // Append chunk content, up to a reasonable limit per source
+      if (source.content.length < 2500) {
+        source.content += (source.content ? '\n...' : '') + r.content;
+      }
+    });
+
+    const combinedSources = Array.from(sourceMap.values());
 
     // Synthesize the answer
     const answer = await synthesizeAnswer(q, combinedSources);
