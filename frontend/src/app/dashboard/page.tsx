@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { SearchBar } from "@/components/search-bar";
+import { ContinueWatching } from "@/components/continue-watching";
 
 export default function Home() {
   const router = useRouter();
@@ -77,6 +78,8 @@ export default function Home() {
         </div>
 
         <SearchBar />
+
+        <ContinueWatching />
 
         <div className="w-full pt-16 mt-16 border-t border-[#262626]">
           <div className="mb-8">

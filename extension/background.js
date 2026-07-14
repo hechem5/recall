@@ -144,4 +144,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })();
     return true; // Keep channel open
   }
+
+  if (request.action === "reportWatchProgress") {
+    (async () => {
+      const API_URL = "https://recall-fnvw.onrender.com";
+      const { appToken } = await chrome.storage.local.get(['appToken']);
+      if (!appToken) return sendResponse({ success: false });
+
+      try {
+        const res = await fetch(`${API_URL}/api/watch-progress`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${appToken}`
+          },
+          body: JSON.stringify({
+            url: request.url,
+            title: request.title,
+            currentTime: request.currentTime,
+            duration: request.duration
+          })
+        });
+        
+        if (res.ok) {
+          sendResponse({ success: true });
+        } else {
+          sendResponse({ success: false });
+        }
+      } catch (e) {
+        sendResponse({ success: false });
+      }
+    })();
+    return true; // Keep channel open
+  }
 });

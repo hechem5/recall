@@ -9,16 +9,17 @@ datasource db {
 }
 
 model Safe {
-  id           String      @id @default(cuid())
+  id           String   @id @default(cuid())
   passwordHash String
-  createdAt    DateTime    @default(now())
+  createdAt    DateTime @default(now())
 
-  devices      TrustedDevice[]
+  devices       TrustedDevice[]
   recoveryCodes RecoveryCode[]
 
-  sources      Source[]
-  tags         Tag[]
-  digests      Digest[]
+  sources         Source[]
+  tags            Tag[]
+  digests         Digest[]
+  watchProgresses WatchProgress[]
 }
 
 model TrustedDevice {
@@ -40,53 +41,68 @@ model RecoveryCode {
 }
 
 model Source {
-  id           String      @id @default(cuid())
-  safeId       String
-  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
-  type         String      // "text", "url", "pdf", "file"
-  title        String?
-  originalUrl  String?
-  rawText      String
-  createdAt    DateTime    @default(now())
-  lastAccessedAt DateTime  @default(now())
-  chunks       Chunk[]
-  tags         SourceTag[]
+  id             String      @id @default(cuid())
+  safeId         String
+  safe           Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  type           String // "text", "url", "pdf", "file"
+  title          String?
+  originalUrl    String?
+  rawText        String
+  createdAt      DateTime    @default(now())
+  lastAccessedAt DateTime    @default(now())
+  chunks         Chunk[]
+  tags           SourceTag[]
 }
 
 model Chunk {
-  id           String      @id @default(cuid())
-  sourceId     String
-  source       Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  content      String
-  chunkIndex   Int
-  embedding    Unsupported("vector(768)")?
-  createdAt    DateTime    @default(now())
+  id         String                      @id @default(cuid())
+  sourceId   String
+  source     Source                      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  content    String
+  chunkIndex Int
+  embedding  Unsupported("vector(768)")?
+  createdAt  DateTime                    @default(now())
 }
 
 model Tag {
-  id           String      @id @default(cuid())
-  safeId       String
-  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
-  name         String
-  sources      SourceTag[]
+  id      String      @id @default(cuid())
+  safeId  String
+  safe    Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  name    String
+  sources SourceTag[]
 
   @@unique([safeId, name])
 }
 
 model SourceTag {
-  sourceId     String
-  tagId        String
-  source       Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  tag          Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  sourceId String
+  tagId    String
+  source   Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([sourceId, tagId])
 }
 
 model Digest {
-  id           String      @id @default(cuid())
-  safeId       String
-  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
-  content      String
+  id                String   @id @default(cuid())
+  safeId            String
+  safe              Safe     @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  content           String
   orphanedSourceIds String? // JSON string array of IDs
-  createdAt    DateTime    @default(now())
+  createdAt         DateTime @default(now())
+}
+
+model WatchProgress {
+  id              String   @id @default(cuid())
+  safeId          String
+  safe            Safe     @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  url             String
+  title           String?
+  currentTime     Float
+  duration        Float
+  percentComplete Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([safeId, url])
 }

@@ -5,6 +5,7 @@ import ingestRouter from './routes/ingest';
 import searchRouter from './routes/search';
 import jobsRouter from './routes/jobs';
 import authRouter from './routes/auth';
+import watchProgressRouter from './routes/watchProgress';
 import path from 'path';
 
 dotenv.config({ path: '../.env' }); // Assuming root .env
@@ -85,6 +86,7 @@ app.use('/api/ingest', ingestRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/jobs', jobsRouter);
 app.use('/api/memories', memoriesRouter);
+app.use('/api/watch-progress', watchProgressRouter);
 app.use('/api/uploads', express.static(uploadsDir));
 
 // Global Error Handler

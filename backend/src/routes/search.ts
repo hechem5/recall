@@ -53,11 +53,31 @@ router.get('/', async (req, res) => {
       select: { id: true, title: true, originalUrl: true, type: true, createdAt: true, rawText: true }
     });
 
-    if (results.length === 0 && recentSources.length === 0) {
+    // Grab the 5 most recently updated watch progress records
+    const recentWatchProgress = await prisma.watchProgress.findMany({
+      where: recentWhere, // Reusing recentWhere since safeId and dateCondition map over
+      orderBy: { updatedAt: 'desc' },
+      take: 5
+    });
+
+    if (results.length === 0 && recentSources.length === 0 && recentWatchProgress.length === 0) {
       return res.json({ answer: "I couldn't find anything related to that in your memory.", sources: [] });
     }
 
     const sourceMap = new Map();
+
+    // Add recent watch progress first
+    recentWatchProgress.forEach(w => {
+      sourceMap.set(`watch-${w.id}`, {
+        sourceId: `watch-${w.id}`,
+        content: `Watched video: ${w.title || w.url} - Progress: ${Math.round(w.percentComplete * 100)}% complete (${Math.round(w.currentTime)}s of ${Math.round(w.duration)}s)`,
+        title: w.title,
+        url: w.url,
+        type: 'watch-progress',
+        savedAt: new Date(w.updatedAt).toLocaleString(),
+        isRecent: true
+      });
+    });
 
     // Add recent sources first so they are at the top and clearly marked
     recentSources.forEach(r => {

@@ -4,6 +4,7 @@ export async function synthesizeAnswer(query: string, contextChunks: { sourceId:
     url: 'Saved webpage',
     file: 'Uploaded document',
     text: 'Text note',
+    'watch-progress': 'Watched Video/Show',
   };
 
   const contextBlock = contextChunks.map((c, i) => {
