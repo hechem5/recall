@@ -2,86 +2,77 @@
 
 **Total Information Retrieval.**
 
-Recall is a locally bound, cryptographically secured memory extension. Save articles, PDFs, and text snippets instantly via the browser extension, and retrieve them via semantic vector search and AI synthesis.
+**Live Demo:** [https://recall-phi-gold.vercel.app/](https://recall-phi-gold.vercel.app/)
 
-## 🚀 Features
+Recall is a locally bound, cryptographically secured memory extension. Save articles, PDFs, and text snippets instantly via the browser extension, and retrieve them via semantic vector search and AI synthesis. 
 
-### Core Capabilities
-* **Hardware Bound Security:** Your vault generates a unique cryptographic signature based on your physical device. Even with the correct password, access is denied from unrecognized hardware.
-* **Semantic Vector Search:** Data is automatically chunked and embedded using advanced embedding models. Search not just for keywords, but for meaning, concepts, and ideas. Recall instantly understands the context of your query.
-* **AI Synthesis:** Queries don't just return links. An integrated Large Language Model synthesizes the exact answer directly from your saved sources, complete with citations.
+---
 
-### Dashboard Management
-* **Time-Based Searching:** Filter your natural language queries by time (`Past Week`, `Past Month`, `Past Year`, `All Time`) to prevent pulling up ancient, irrelevant memories.
-* **Memory Management:** A full UI to view, manage, and permanently delete saved websites, text notes, and documents. Deletions cleanly cascade to remove all associated vector chunks from the database.
-* **Bulk Export:** Instantly download a complete backup of everything you've ever saved to your vault as a structured JSON file.
+## 💡 Why Recall?
 
-### Chrome Extension Integration
-* **One-Click Tab Saving:** Instantly archive the current webpage you are viewing. The extension bypasses JavaScript/SPA loading issues by directly extracting the fully rendered DOM text.
-* **Text & File Uploads:** Drop PDF, TXT, or DOCX files directly into the extension, or paste raw text snippets to archive them on the fly.
-* **Search Anywhere:** Access your entire vault and chat with your AI directly from the extension popup without needing to open the dashboard.
+We consume massive amounts of information daily—articles, research papers, tweets, and documentation. Bookmarks are useless because we forget *why* we saved them, and traditional search requires knowing exact keywords. Recall solves this by acting as a true extension of your memory. You save things instantly, and when you need them months later, you simply ask a question in natural language. The AI understands the semantic meaning of your query, finds the relevant saved data, and synthesizes an exact answer with citations.
 
-## 🛠 Tech Stack
+---
 
-* **Frontend:** Next.js 14, React, Tailwind CSS, Lucide Icons
-* **Backend:** Node.js, Express.js, Prisma ORM
-* **Database:** PostgreSQL with `pgvector` extension (hosted on Supabase)
-* **AI & Embeddings:** Google Gemini APIs
-* **Extension:** Chrome Manifest V3
+## 🌐 The Web Dashboard
 
-## 💻 Local Development Setup
+The central hub for managing your memories and interacting with your data.
 
-### Prerequisites
-* Node.js (v18+)
-* PostgreSQL database with `pgvector` enabled (e.g., Supabase)
-* Google Gemini API Key
+### 1. Hardware-Bound Safe
+* **What it is:** A secure login system that ties your account to your specific physical device.
+* **Why it's there:** To ensure absolute privacy. Even if someone obtains your password, they cannot access your vault from an unauthorized computer. 
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/hechem5/recall.git
-cd recall
-```
+### 2. AI Synthesis & Semantic Search
+* **What it is:** A Google-like search bar that accepts natural language questions. It returns an AI-generated answer complete with source citations linking back to your original files.
+* **Why it's there:** Because finding information shouldn't require exact keyword matches. The AI reads through your saved chunks, understands the context, and gives you a direct answer so you don't have to re-read the entire document.
 
-### 2. Backend Setup
-```bash
-cd backend
-npm install
-```
-Create a `.env` file in the `backend` directory:
-```env
-PORT=3001
-DATABASE_URL="postgresql://user:password@host:port/db"
-GEMINI_API_KEY="your_gemini_api_key"
-NODE_ENV="development"
-FRONTEND_URL="http://localhost:3000"
-```
-Run Prisma migrations and start the server:
-```bash
-npx prisma generate
-npx prisma db push
-npm run dev
-```
+### 3. Time-Based Filtering
+* **What it is:** A dropdown to filter searches by `Past Week`, `Past Month`, `Past Year`, or `All Time`.
+* **Why it's there:** As your vault grows to thousands of memories, the AI might find semantically similar but outdated information. Filtering ensures you only retrieve the most relevant, recent data.
 
-### 3. Frontend Setup
-```bash
-cd ../frontend
-npm install
-```
-Create a `.env.local` file in the `frontend` directory:
-```env
-NEXT_PUBLIC_API_URL="http://127.0.0.1:3001"
-```
-Start the development server:
-```bash
-npm run dev
-```
+### 4. Memory Management
+* **What it is:** A dedicated UI to view a chronological list of everything you've saved, with the ability to permanently delete items.
+* **Why it's there:** To keep your vault clean. Removing outdated or incorrect information ensures your AI doesn't synthesize answers based on bad data.
 
-### 4. Extension Setup
-1. Open Google Chrome and navigate to `chrome://extensions/`
-2. Enable **Developer mode** in the top right corner.
-3. Click **Load unpacked** and select the `extension` folder from the cloned repository.
-4. Pin the extension to your toolbar.
-5. Click the extension icon, click the Settings gear ⚙️, and follow the setup instructions to bind your device.
+### 5. Bulk Vault Export
+* **What it is:** A one-click button to download your entire vault history as a structured `.json` file.
+* **Why it's there:** Data portability. Your memories belong to you, and you should never be locked into a closed ecosystem.
+
+### 6. Emergency Recovery System
+* **What it is:** A 12-word cryptographic seed phrase generated upon account creation.
+* **Why it's there:** Because your vault is hardware-bound. If you lose your computer or clear your browser cache, the recovery phrase is the *only* way to bypass the hardware lock and restore access to your memories on a new device.
+
+---
+
+## 🔌 The Browser Extension
+
+The fastest way to get information into your vault without disrupting your workflow.
+
+### 1. One-Click Tab Saving
+* **What it is:** A button that instantly extracts the text of the webpage you are currently reading and saves it to your vault.
+* **Why it's there:** Speed. It bypasses JavaScript loading screens and popups by grabbing the fully rendered text directly from your active tab.
+
+### 2. Quick Text Archiver
+* **What it is:** A dedicated text box inside the extension popup.
+* **Why it's there:** For transient thoughts, quick notes, or copying/pasting specific paragraphs without needing to save the entire webpage.
+
+### 3. File Dropzone
+* **What it is:** A drag-and-drop area for local files (PDFs, TXT, DOCX).
+* **Why it's there:** Because your memory isn't just websites. You need a way to archive local research papers, documents, and reports so the AI can read them later.
+
+### 4. In-Extension Search
+* **What it is:** A miniature version of the dashboard search bar right inside the popup.
+* **Why it's there:** To allow you to query your vault and get AI answers without having to open a new tab and navigate to the dashboard.
+
+---
+
+## 💻 Local Setup
+
+1. Clone the repository: `git clone https://github.com/hechem5/recall.git`
+2. Run `npm install` in both the `backend` and `frontend` directories.
+3. Configure your `.env` files with your database and AI API keys.
+4. Run `npm run dev` in both directories to start the development servers.
+5. Load the `/extension` folder into Chrome via `chrome://extensions/` -> **Load Unpacked**.
 
 ---
 
