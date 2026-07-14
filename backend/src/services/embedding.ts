@@ -18,10 +18,11 @@ export async function embedText(text: string): Promise<number[]> {
   const result = await model.batchEmbedContents({
     requests: [{
       content: { role: "user", parts: [{ text }] },
+      // @ts-ignore - outputDimensionality is supported by API but missing in TS types
       outputDimensionality: 768
     }]
   });
-  return result.embeddings[0].values;
+  return result.embeddings[0]!.values;
 }
 
 export async function embedTexts(texts: string[]): Promise<number[][]> {
@@ -32,10 +33,11 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
     const batchTexts = texts.slice(i, i + 100);
     const requests = batchTexts.map(t => ({
       content: { role: "user", parts: [{ text: t }] },
+      // @ts-ignore
       outputDimensionality: 768
     }));
     
-    const result = await model.batchEmbedContents({ requests });
+    const result = await model.batchEmbedContents({ requests: requests as any });
     allEmbeddings.push(...result.embeddings.map(e => e.values));
   }
   
