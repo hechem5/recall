@@ -34,13 +34,17 @@ The central hub for managing your memories and interacting with your data.
 * **What it is:** A dedicated UI to view a chronological list of everything you've saved, with the ability to permanently delete items.
 * **Why it's there:** To keep your vault clean. Removing outdated or incorrect information ensures your AI doesn't synthesize answers based on bad data.
 
-### 5. Bulk Vault Export
+### 5. Continue Watching Tracker
+* **What it is:** A dedicated dashboard section that lists your recently watched videos (YouTube, Anime, etc.) chronologically, intelligently grouping older episodes together so only the latest episode of any given series is shown.
+* **Why it's there:** To act as your personal, unified Netflix-style history for all web video content, keeping your dashboard completely clutter-free.
+
+### 6. Settings & Emergency Recovery System
+* **What it is:** A 12-word cryptographic seed phrase system, with a dedicated dashboard Settings page to view and regenerate new device recovery codes.
+* **Why it's there:** Because your vault is hardware-bound. If you lose your computer, wipe your browser, or install the extension fresh, the recovery phrase is the *only* way to bypass the hardware lock. The Settings UI ensures you can always generate a fresh batch of codes.
+
+### 7. Bulk Vault Export
 * **What it is:** A one-click button to download your entire vault history as a structured `.json` file.
 * **Why it's there:** Data portability. Your memories belong to you, and you should never be locked into a closed ecosystem.
-
-### 6. Emergency Recovery System
-* **What it is:** A 12-word cryptographic seed phrase generated upon account creation.
-* **Why it's there:** Because your vault is hardware-bound. If you lose your computer or clear your browser cache, the recovery phrase is the *only* way to bypass the hardware lock and restore access to your memories on a new device.
 
 ---
 
@@ -68,9 +72,9 @@ The fastest way to get information into your vault without disrupting your workf
 * **What it is:** Highlight any text on any webpage, right-click, and select "Save Selection to Recall".
 * **Why it's there:** When you don't need the entire article, you can selectively save exact quotes. It captures the text and binds it to the exact source URL for perfect citations.
 
-### 6. Smart Saves & Continue Watching
-* **What it is:** An opt-in feature that passively tracks your reading time and video-watch progress (e.g. YouTube, anime sites) and automatically saves where you left off. You can pin up to 2 items as favorites to resume them directly from the extension popup.
-* **Why it's there:** To automate the process of remembering your place. It prevents tab hoarding and lets you seamlessly resume your shows without manual bookmarking.
+### 6. Smart Saves & Auto-Advance Handoff
+* **What it is:** An intelligent opt-in tracker that runs quietly in the background. It dynamically polls for video players to track your exact watch progress, and uses smart heuristics to auto-advance your pinned shows. If you finish an episode and click "Next Episode", the tracker automatically detects the transition, unfavorites the old episode, and pins the new one without a single click.
+* **Why it's there:** To completely automate remembering your place across the internet. It prevents tab hoarding and acts as a completely seamless, hands-free video tracker.
 
 ---
 
