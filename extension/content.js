@@ -1,7 +1,23 @@
 (async () => {
+  // Always register listener for background responses (e.g. popups triggered by iframes)
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "videoStatusResponse") {
+      if (request.status === "auto_advanced") {
+        showAutoFavoriteToast();
+      } else if (request.status === "prompt_user") {
+        chrome.storage.local.get(['dismissedFavorites'], (res) => {
+          const dismissed = res.dismissedFavorites || [];
+          if (!dismissed.includes(window.location.hostname)) {
+            showNewFavoritePrompt();
+          }
+        });
+      }
+    }
+  });
+
   // Simple heuristic for an article or video
   const isArticle = !!document.querySelector('article') || document.body.innerText.split(/\s+/).length > 500;
-  const isVideo = !!document.querySelector('video');
+  const isVideo = !!document.querySelector('video') || !!document.querySelector('iframe');
   if (!isArticle && !isVideo) return;
 
   const getConsent = () => new Promise((resolve) => {
@@ -208,21 +224,7 @@
     }
   }
 
-  // Listener for background responses
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "videoStatusResponse") {
-      if (request.status === "auto_advanced") {
-        showAutoFavoriteToast();
-      } else if (request.status === "prompt_user") {
-        chrome.storage.local.get(['dismissedFavorites'], (res) => {
-          const dismissed = res.dismissedFavorites || [];
-          if (!dismissed.includes(window.location.hostname)) {
-            showNewFavoritePrompt();
-          }
-        });
-      }
-    }
-  });
+  // Listener moved to top
 
   function showAutoFavoriteToast() {
     if (document.getElementById('recall-auto-fav-toast')) return;
