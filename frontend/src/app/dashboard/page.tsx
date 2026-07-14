@@ -13,6 +13,27 @@ export default function Home() {
     router.refresh();
   };
 
+  const handleExport = async () => {
+    try {
+      const res = await fetch("/api/proxy/memories/export");
+      if (!res.ok) throw new Error("Export failed");
+      const data = await res.json();
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `recall-vault-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to export vault.");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center">
       
@@ -21,12 +42,26 @@ export default function Home() {
         <a href="/" className="text-xl font-bold tracking-widest uppercase hover:text-[#FF3366] transition-colors cursor-pointer text-decoration-none">
           Recall<span className="text-[#FF3366]">_</span>
         </a>
-        <button 
-          onClick={handleLogout}
-          className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"
-        >
-          [ LOGOUT ]
-        </button>
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={handleExport}
+            className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
+          >
+            [ EXPORT VAULT ]
+          </button>
+          <button 
+            onClick={() => router.push('/dashboard/memories')}
+            className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors hidden md:block"
+          >
+            [ MANAGE MEMORIES ]
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"
+          >
+            [ LOGOUT ]
+          </button>
+        </div>
       </div>
 
       <div className="w-full max-w-5xl flex flex-col space-y-16">

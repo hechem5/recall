@@ -40,6 +40,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Export Vault
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      exportBtn.disabled = true;
+      try {
+        const res = await fetch(`${API_URL}/api/memories/export`, {
+          headers: { 'Authorization': `Bearer ${config.appToken}` }
+        });
+        if (!res.ok) throw new Error("Failed to export vault");
+        const data = await res.json();
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const reader = new FileReader();
+        reader.onload = function() {
+          chrome.downloads.download({
+            url: reader.result as string,
+            filename: `recall-vault-export-${new Date().toISOString().split('T')[0]}.json`,
+            saveAs: true
+          });
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to export vault.");
+      } finally {
+        exportBtn.disabled = false;
+      }
+    });
+  }
+
   // Save Current Tab
   document.getElementById('saveTabBtn').addEventListener('click', async () => {
     saveTabBtn.disabled = true;
@@ -94,17 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const timeRangeSelect = document.getElementById('timeRangeSelect');
+
   // Search
   searchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const query = searchInput.value.trim();
     if (!query) return;
+    const timeRange = timeRangeSelect ? timeRangeSelect.value : 'all';
 
     resultsContainer.classList.add('hidden');
     loadingIndicator.classList.remove('hidden');
 
     try {
-      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}&timeRange=${timeRange}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${config.appToken}`

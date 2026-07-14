@@ -68,9 +68,12 @@ app.use('/api', (req, res, next) => {
   }
 });
 
+import memoriesRouter from './routes/memories';
+
 app.use('/api/ingest', ingestRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/jobs', jobsRouter);
+app.use('/api/memories', memoriesRouter);
 app.use('/api/uploads', express.static(uploadsDir));
 
 // Global Error Handler

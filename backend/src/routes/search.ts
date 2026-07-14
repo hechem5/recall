@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Prisma } from '@prisma/client';
 import prisma from '../prisma';
 import { embedText } from '../services/embedding';
 import { synthesizeAnswer } from '../services/synthesis';
@@ -8,6 +9,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const q = req.query.q as string;
+    const timeRange = req.query.timeRange as string || 'all';
     const safeId = (req as any).user?.safeId;
 
     if (!q) return res.status(400).json({ error: 'Missing query parameter q' });
@@ -17,6 +19,20 @@ router.get('/', async (req, res) => {
     const queryEmbedding = await embedText(q);
     const embeddingStr = `[${queryEmbedding.join(',')}]`;
 
+    let dateCondition = Prisma.empty;
+    let recentWhere: any = { safeId };
+
+    if (timeRange === 'week') {
+      dateCondition = Prisma.sql`AND "Source"."createdAt" >= NOW() - INTERVAL '7 days'`;
+      recentWhere.createdAt = { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) };
+    } else if (timeRange === 'month') {
+      dateCondition = Prisma.sql`AND "Source"."createdAt" >= NOW() - INTERVAL '30 days'`;
+      recentWhere.createdAt = { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
+    } else if (timeRange === 'year') {
+      dateCondition = Prisma.sql`AND "Source"."createdAt" >= NOW() - INTERVAL '365 days'`;
+      recentWhere.createdAt = { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) };
+    }
+
     // Perform vector similarity search — retrieve top 15 so we have more coverage
     // Filter by the user's Safe ID to prevent cross-tenant data leakage
     const results = await prisma.$queryRaw<any[]>`
@@ -24,14 +40,14 @@ router.get('/', async (req, res) => {
              1 - ("Chunk".embedding <=> ${embeddingStr}::vector) as similarity
       FROM "Chunk"
       JOIN "Source" ON "Chunk"."sourceId" = "Source".id
-      WHERE "Source"."safeId" = ${safeId}
+      WHERE "Source"."safeId" = ${safeId} ${dateCondition}
       ORDER BY "Chunk".embedding <=> ${embeddingStr}::vector
       LIMIT 15;
     `;
 
     // Also grab the 5 most recently saved sources so we can answer "last X I saved" queries
     const recentSources = await prisma.source.findMany({
-      where: { safeId },
+      where: recentWhere,
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: { id: true, title: true, originalUrl: true, type: true, createdAt: true, rawText: true }

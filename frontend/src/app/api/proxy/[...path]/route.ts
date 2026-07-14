@@ -75,3 +75,32 @@ export async function POST(request: Request, { params }: { params: Promise<{ pat
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ path: string[] }> }) {
+  try {
+    const session = await getSession();
+    if (!session.isLoggedIn) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const resolvedParams = await params;
+    const url = new URL(request.url);
+    const backendUrl = `${BACKEND_URL}/api/${resolvedParams.path.join("/")}${url.search}`;
+    
+    console.log(`[Proxy DELETE] Forwarding to ${backendUrl}`);
+    const res = await fetch(backendUrl, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${session.token}` }
+    });
+
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error(`Backend did not return JSON. Status: ${res.status}, Body: ${text.substring(0, 50)}`);
+    }
+    return NextResponse.json(data, { status: res.status });
+  } catch (error: any) {
+    console.error("[Proxy DELETE Error]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

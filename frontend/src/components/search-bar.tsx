@@ -15,6 +15,7 @@ interface Source {
 
 export function SearchBar() {
   const [query, setQuery] = useState("");
+  const [timeRange, setTimeRange] = useState("all");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ answer: string; sources: Source[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +29,7 @@ export function SearchBar() {
     setResult(null);
 
     try {
-      const res = await fetch(`/api/proxy/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/proxy/search?q=${encodeURIComponent(query)}&timeRange=${timeRange}`);
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();
       setResult(data);
@@ -42,21 +43,35 @@ export function SearchBar() {
 
   return (
     <div className="w-full flex flex-col space-y-12">
-      <form onSubmit={handleSearch} className="relative w-full group">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask a question or search..."
-          className="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-6 text-xl md:text-3xl font-medium outline-none transition-colors placeholder:text-[#404040]"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="absolute right-0 top-1/2 -translate-y-1/2 text-sm font-bold tracking-widest text-[#737373] hover:text-[#FF3366] transition-colors disabled:opacity-50"
-        >
-          {loading ? "SEARCHING..." : "SEARCH"}
-        </button>
+      <form onSubmit={handleSearch} className="relative w-full group flex flex-col space-y-2">
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Ask a question or search..."
+            className="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-6 text-xl md:text-3xl font-medium outline-none transition-colors placeholder:text-[#404040]"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-sm font-bold tracking-widest text-[#737373] hover:text-[#FF3366] transition-colors disabled:opacity-50"
+          >
+            {loading ? "SEARCHING..." : "SEARCH"}
+          </button>
+        </div>
+        <div className="flex justify-end">
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(e.target.value)} 
+            className="bg-transparent text-xs font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] outline-none cursor-pointer transition-colors border-none"
+          >
+            <option value="all" className="bg-[#0A0A0A]">Time: All</option>
+            <option value="week" className="bg-[#0A0A0A]">Time: Past Week</option>
+            <option value="month" className="bg-[#0A0A0A]">Time: Past Month</option>
+            <option value="year" className="bg-[#0A0A0A]">Time: Past Year</option>
+          </select>
+        </div>
       </form>
 
       {error && (
