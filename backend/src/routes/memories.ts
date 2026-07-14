@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
         type: true,
         title: true,
         originalUrl: true,
+        rawText: true,
         createdAt: true,
       }
     });

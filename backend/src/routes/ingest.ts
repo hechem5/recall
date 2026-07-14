@@ -158,6 +158,21 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.json({ success: true, source });
     }
 
+    if (type === 'highlight') {
+      const { context, url } = req.body;
+      const combinedText = `${content}\n\n--- Context ---\n${context || 'No surrounding context available'}`;
+      
+      const existing = await prisma.source.findFirst({
+        where: { safeId, type: 'highlight', originalUrl: url, rawText: combinedText }
+      });
+      if (existing) {
+        return res.json({ success: true, source: existing, alreadySaved: true });
+      }
+      
+      const source = await ingestText(safeId, 'highlight', combinedText, title, url, tags);
+      return res.json({ success: true, source });
+    }
+
     return res.status(400).json({ error: 'Invalid type or missing content' });
 
   } catch (error) {

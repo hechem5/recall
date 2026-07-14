@@ -24,7 +24,8 @@
     "activeTab",
     "contextMenus",
     "storage",
-    "scripting"
+    "scripting",
+    "notifications"
   ],
   "host_permissions": [],
   "content_scripts": [

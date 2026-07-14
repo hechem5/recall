@@ -26,27 +26,6 @@ router.post('/weekly-digest', async (req, res) => {
         orderBy: { createdAt: 'desc' }
       });
 
-      if (recentChunks.length === 0) continue;
-
-      const context = recentChunks.map(c => `Title: ${c.source.title || 'Untitled'}\nText: ${c.content}`).join('\n\n---\n\n');
-      const prompt = `You are a memory assistant. Generate a beautifully formatted, concise weekly digest of the following memories saved by the user over the last 7 days. Group them by themes if possible. Use markdown formatting.\n\nMemories:\n${context}\n`;
-
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "Recall Semantic Search",
-        },
-        body: JSON.stringify({
-          model: "openrouter/auto",
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0.3,
-          max_tokens: 1500,
-        })
-      });
-
       const ORPHAN_DAYS = parseInt(process.env.ORPHAN_DAYS_THRESHOLD || '90', 10);
       const MIN_SOURCES = parseInt(process.env.ORPHAN_MIN_SOURCE_COUNT || '20', 10);
       
@@ -64,19 +43,46 @@ router.post('/weekly-digest', async (req, res) => {
         orphanedSourceIds = orphans.map(o => o.id);
       }
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-          await prisma.digest.create({
-            data: {
-              content: data.choices[0].message.content,
-              safeId: safe.id,
-              orphanedSourceIds: JSON.stringify(orphanedSourceIds)
-            }
-          });
-          createdCount++;
+      if (recentChunks.length === 0 && orphanedSourceIds.length === 0) continue;
+
+      let digestContent = "No new saves this week.";
+
+      if (recentChunks.length > 0) {
+        const context = recentChunks.map(c => `Title: ${c.source.title || 'Untitled'}\nText: ${c.content}`).join('\n\n---\n\n');
+        const prompt = `You are a memory assistant. Generate a beautifully formatted, concise weekly digest of the following memories saved by the user over the last 7 days. Group them by themes if possible. Use markdown formatting.\n\nMemories:\n${context}\n`;
+
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "Recall Semantic Search",
+          },
+          body: JSON.stringify({
+            model: "openrouter/auto",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.3,
+            max_tokens: 1500,
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.choices && data.choices[0] && data.choices[0].message) {
+            digestContent = data.choices[0].message.content;
+          }
         }
       }
+
+      await prisma.digest.create({
+        data: {
+          content: digestContent,
+          safeId: safe.id,
+          orphanedSourceIds: JSON.stringify(orphanedSourceIds)
+        }
+      });
+      createdCount++;
     }
 
     return res.json({ success: true, digestsCreated: createdCount });
