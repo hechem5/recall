@@ -1,10 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 
-const secret = process.env.SESSION_SECRET;
-
-if (!secret || secret.length < 32) {
-  throw new Error("CRITICAL: SESSION_SECRET environment variable is missing or less than 32 characters. Server refusing to start to prevent token forging.");
-}
+const secret = process.env.SESSION_SECRET as string;
 
 export const JWT_SECRET = secret;
 

@@ -9,6 +9,9 @@ import path from 'path';
 
 dotenv.config({ path: '../.env' }); // Assuming root .env
 
+import { checkEnv } from './lib/env-check';
+checkEnv();
+
 const app = express();
 const port = process.env.PORT || 3001;
 
