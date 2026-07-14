@@ -156,4 +156,117 @@ document.addEventListener('DOMContentLoaded', () => {
       resultsContainer.classList.remove('hidden');
     }
   });
+
+  // Tab Switcher
+  const tabSearchBtn = document.getElementById('tabSearchBtn');
+  const tabTextBtn = document.getElementById('tabTextBtn');
+  const tabFileBtn = document.getElementById('tabFileBtn');
+  
+  const searchContainer = document.getElementById('searchContainer');
+  const textContainer = document.getElementById('textContainer');
+  const fileContainer = document.getElementById('fileContainer');
+
+  function switchTab(activeBtn, activeContainer) {
+    [tabSearchBtn, tabTextBtn, tabFileBtn].forEach(btn => {
+      btn.classList.remove('text-[#FF3366]');
+      btn.classList.add('text-[#737373]');
+    });
+    activeBtn.classList.remove('text-[#737373]');
+    activeBtn.classList.add('text-[#FF3366]');
+
+    [searchContainer, textContainer, fileContainer, resultsContainer].forEach(c => c.classList.add('hidden'));
+    activeContainer.classList.remove('hidden');
+    if (activeBtn === tabSearchBtn) searchInput.focus();
+  }
+
+  tabSearchBtn.addEventListener('click', () => switchTab(tabSearchBtn, searchContainer));
+  tabTextBtn.addEventListener('click', () => switchTab(tabTextBtn, textContainer));
+  tabFileBtn.addEventListener('click', () => switchTab(tabFileBtn, fileContainer));
+
+  // Save Text
+  const textInput = document.getElementById('textInput');
+  const saveTextBtn = document.getElementById('saveTextBtn');
+
+  saveTextBtn.addEventListener('click', async () => {
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    saveTextBtn.disabled = true;
+    saveTextBtn.textContent = '[ SAVING... ]';
+
+    try {
+      const res = await fetch(`${API_URL}/api/ingest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.appToken}`
+        },
+        body: JSON.stringify({
+          type: 'text',
+          content: text,
+          title: 'Note from Extension'
+        })
+      });
+
+      if (!res.ok) throw new Error("Failed to save text");
+      textInput.value = '';
+      saveTextBtn.textContent = '[ ARCHIVED ]';
+    } catch (e) {
+      saveTextBtn.textContent = '[ ERROR ]';
+    }
+    setTimeout(() => { saveTextBtn.textContent = '[ Archive Text ]'; saveTextBtn.disabled = false; }, 2000);
+  });
+
+  // Save File
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const fileUploadStatus = document.getElementById('fileUploadStatus');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-[#FF3366]');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-[#FF3366]');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-[#FF3366]');
+    if (e.dataTransfer.files.length) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) {
+      handleFileUpload(e.target.files[0]);
+    }
+  });
+
+  async function handleFileUpload(file) {
+    fileUploadStatus.textContent = 'UPLOADING...';
+    fileUploadStatus.classList.remove('hidden');
+
+    const formData = new FormData();
+    formData.append('type', 'file');
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(`${API_URL}/api/ingest`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.appToken}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error("Failed to upload file");
+      fileUploadStatus.textContent = 'UPLOADED SUCCESSFULLY';
+    } catch (e) {
+      fileUploadStatus.textContent = 'ERROR UPLOADING';
+    }
+    setTimeout(() => { fileUploadStatus.classList.add('hidden'); }, 3000);
+  }
+
 });

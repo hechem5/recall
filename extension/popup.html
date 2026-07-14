@@ -38,7 +38,9 @@
   <!-- Main State -->
   <div id="mainView" class="hidden p-6 flex flex-col space-y-6">
     <div class="flex justify-between items-center border-b border-[#262626] pb-4">
-      <h1 class="text-xl font-bold tracking-widest uppercase">Recall<span class="text-[#FF3366]">_</span></h1>
+      <a href="https://recall-phi-gold.vercel.app/" target="_blank" class="text-xl font-bold tracking-widest uppercase hover:text-[#FF3366] transition-colors text-decoration-none">
+        Recall<span class="text-[#FF3366]">_</span>
+      </a>
       <button id="saveTabBtn" class="text-xs font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors">
         [ Save Tab ]
       </button>
@@ -47,21 +49,56 @@
     <!-- Quick Save Status -->
     <div id="saveStatus" class="hidden text-xs text-[#FF3366] tracking-widest uppercase text-center"></div>
 
-    <form id="searchForm" class="flex flex-col space-y-4">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Search Archive..." 
-        class="w-full bg-transparent border-b border-[#262626] focus:border-[#FF3366] py-2 text-sm outline-none transition-colors"
-        required
-      />
-    </form>
-
-    <div id="loadingIndicator" class="hidden text-xs text-[#737373] tracking-widest uppercase text-center animate-pulse">
-      SEARCHING...
+    <!-- Tabs -->
+    <div class="flex gap-4 text-xs font-bold tracking-widest uppercase">
+      <button id="tabSearchBtn" class="text-[#FF3366] transition-colors">Search</button>
+      <button id="tabTextBtn" class="text-[#737373] hover:text-[#E5E5E5] transition-colors">Text</button>
+      <button id="tabFileBtn" class="text-[#737373] hover:text-[#E5E5E5] transition-colors">File</button>
     </div>
 
-    <div id="resultsContainer" class="hidden flex flex-col space-y-4">
+    <!-- Search View -->
+    <div id="searchContainer" class="flex flex-col space-y-4">
+      <form id="searchForm" class="flex flex-col space-y-4">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search Archive..." 
+          class="w-full bg-transparent border-b border-[#262626] focus:border-[#FF3366] py-2 text-sm outline-none transition-colors"
+          required
+        />
+      </form>
+
+      <div id="loadingIndicator" class="hidden text-xs text-[#737373] tracking-widest uppercase text-center animate-pulse mt-4">
+        SEARCHING...
+      </div>
+    </div>
+
+    <!-- Text View -->
+    <div id="textContainer" class="hidden flex flex-col space-y-4">
+      <textarea 
+        id="textInput" 
+        placeholder="Type or paste text to archive..." 
+        class="w-full h-24 bg-[#141414] border border-[#262626] focus:border-[#FF3366] p-2 text-sm outline-none transition-colors resize-none"
+      ></textarea>
+      <button id="saveTextBtn" class="text-xs font-bold tracking-widest uppercase text-[#E5E5E5] hover:text-[#FF3366] transition-colors self-end">
+        [ Archive Text ]
+      </button>
+    </div>
+
+    <!-- File View -->
+    <div id="fileContainer" class="hidden flex flex-col space-y-4">
+      <div 
+        id="dropZone" 
+        class="w-full h-24 border-2 border-dashed border-[#262626] hover:border-[#FF3366] flex flex-col items-center justify-center text-[#737373] hover:text-[#FF3366] transition-colors cursor-pointer text-center p-2"
+      >
+        <span class="text-xs uppercase tracking-widest font-bold mb-1">Click or Drag File</span>
+        <span class="text-[10px] uppercase tracking-widest">PDF, TXT, DOCX</span>
+      </div>
+      <input type="file" id="fileInput" class="hidden" />
+      <div id="fileUploadStatus" class="hidden text-xs text-[#FF3366] tracking-widest uppercase text-center"></div>
+    </div>
+
+    <div id="resultsContainer" class="hidden flex flex-col space-y-4 mt-4">
       <div class="text-xs font-bold text-[#FF3366] tracking-widest uppercase">Answer</div>
       <div id="answerContent" class="markdown-body text-sm leading-relaxed text-[#E5E5E5]"></div>
       
