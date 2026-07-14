@@ -64,6 +64,14 @@ The fastest way to get information into your vault without disrupting your workf
 * **What it is:** A miniature version of the dashboard search bar right inside the popup.
 * **Why it's there:** To allow you to query your vault and get AI answers without having to open a new tab and navigate to the dashboard.
 
+### 5. Highlight & Right-Click to Save
+* **What it is:** Highlight any text on any webpage, right-click, and select "Save Selection to Recall".
+* **Why it's there:** When you don't need the entire article, you can selectively save exact quotes. It captures the text and binds it to the exact source URL for perfect citations.
+
+### 6. Smart Saves & Continue Watching
+* **What it is:** An opt-in feature that passively tracks your reading time and video-watch progress (e.g. YouTube, anime sites) and automatically saves where you left off. You can pin up to 2 items as favorites to resume them directly from the extension popup.
+* **Why it's there:** To automate the process of remembering your place. It prevents tab hoarding and lets you seamlessly resume your shows without manual bookmarking.
+
 ---
 
 ## 💻 Local Setup
