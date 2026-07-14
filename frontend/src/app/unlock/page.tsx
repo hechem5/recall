@@ -12,7 +12,6 @@ export default function UnlockPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Generate the unique hardware signature when the page loads
     const getFingerprint = async () => {
       const fp = await fpPromise.load();
       const result = await fp.get();
@@ -35,70 +34,82 @@ export default function UnlockPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Authentication failed');
+        throw new Error(data.error || 'AUTHENTICATION FAILED');
       }
 
-      // Successfully authenticated
       router.push('/dashboard');
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message.toUpperCase());
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">The Vault</h1>
-          <p className="text-neutral-400 text-sm">Enter your key to unlock your personal safe.</p>
+    <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center justify-center font-mono">
+      
+      <div className="w-full max-w-lg flex flex-col items-center">
+        {/* Header */}
+        <div className="w-full border-b border-[#262626] pb-4 mb-12 text-center">
+          <h1 className="text-3xl font-bold tracking-widest uppercase mb-2">
+            The Vault<span className="text-[#FF3366]">_</span>
+          </h1>
+          <p className="text-xs text-[#737373] tracking-widest uppercase">
+            A cryptographically secured memory archive.
+          </p>
         </div>
 
-        <div className="space-y-6">
-          <div>
+        {/* Input Form */}
+        <div className="w-full space-y-8">
+          <div className="space-y-4 text-center">
+            <label className="block text-xs font-bold tracking-widest uppercase text-[#737373]">
+              Vault Key
+            </label>
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter Vault Key"
-              className="w-full bg-neutral-950 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-neutral-600 text-center text-lg tracking-widest font-mono"
+              placeholder="ENTER KEY..."
+              className="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-4 text-center text-xl tracking-[0.5em] outline-none transition-colors"
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg text-center">
-              {error}
+            <div className="text-xs font-bold tracking-widest uppercase text-[#FF3366] text-center bg-[#FF3366]/10 border border-[#FF3366]/30 py-3">
+              [ ERROR: {error} ]
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button 
               onClick={() => handleAuth('unlock')}
               disabled={loading || !password || !deviceId}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-1/2 border border-[#262626] hover:border-[#FF3366] text-xs font-bold tracking-widest uppercase py-4 transition-colors disabled:opacity-50 hover:text-[#FF3366]"
             >
-              {loading ? 'Processing...' : 'Unlock Safe'}
+              [ {loading ? 'PROCESSING...' : 'UNLOCK'} ]
             </button>
             <button 
               onClick={() => handleAuth('create')}
               disabled={loading || !password || !deviceId}
-              className="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-medium py-3 px-4 rounded-xl transition-colors border border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-1/2 border border-[#262626] hover:border-[#E5E5E5] text-xs font-bold tracking-widest uppercase py-4 transition-colors disabled:opacity-50"
             >
-              Create New
+              [ CREATE NEW ]
             </button>
           </div>
         </div>
-        
-        <div className="mt-8 text-center text-xs text-neutral-600">
-          <p>This vault is cryptographically bound to your current device.</p>
-          <p className="mt-1 font-mono">{deviceId ? `Hardware ID: ${deviceId.substring(0, 8)}...` : 'Generating hardware signature...'}</p>
+
+        {/* Hardware Status */}
+        <div className="w-full border-t border-[#262626] mt-16 pt-8 text-center space-y-2">
+          <p className="text-xs text-[#737373] tracking-widest uppercase">
+            Vault bounds to device hardware.
+          </p>
+          <p className="text-xs tracking-widest uppercase text-[#FF3366]">
+            {deviceId ? `HWID: ${deviceId.substring(0, 16)}` : 'GENERATING HARDWARE SIGNATURE...'}
+          </p>
         </div>
       </div>
-    </div>
+
+    </main>
   );
 }
