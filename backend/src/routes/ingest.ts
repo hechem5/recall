@@ -43,7 +43,9 @@ async function ingestText(type: string, content: string, title?: string, origina
 
   for (let i = 0; i < chunks.length; i++) {
     const chunkId = require('crypto').randomBytes(12).toString('hex');
-    const embeddingStr = `[${embeddings[i].join(',')}]`;
+    const embedding = embeddings[i];
+    if (!embedding) continue;
+    const embeddingStr = `[${embedding.join(',')}]`;
     
     await prisma.$executeRaw`
       INSERT INTO "Chunk" (id, "sourceId", content, "chunkIndex", embedding, "createdAt")

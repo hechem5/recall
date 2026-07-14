@@ -1,6 +1,6 @@
 export async function synthesizeAnswer(
   query: string,
-  sources: { content: string; title?: string | null; url?: string | null; type?: string; savedAt?: string; isRecent?: boolean }[]
+  sources: { content: string; title?: string | null; url?: string | null; type?: string | null; savedAt?: string | undefined; isRecent?: boolean | undefined }[]
 ): Promise<string> {
 
   // Build context from unified sources

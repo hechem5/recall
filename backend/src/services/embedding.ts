@@ -16,8 +16,7 @@ export async function splitText(text: string): Promise<string[]> {
 
 export async function embedText(text: string): Promise<number[]> {
   const result = await model.embedContent({
-    content: { role: "user", parts: [{ text }] },
-    outputDimensionality: 768
+    content: { role: "user", parts: [{ text }] }
   });
   return result.embedding.values;
 }

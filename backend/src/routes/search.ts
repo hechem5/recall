@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
     const citationRegex = /\[(?:Sources? )?([\d, ]+)\]/g;
     let match;
     while ((match = citationRegex.exec(answer)) !== null) {
-      const numbers = match[1].split(',').map(n => parseInt(n.trim(), 10));
+      const numbers = (match[1] || "").split(',').map(n => parseInt(n.trim(), 10));
       for (const num of numbers) {
         if (!isNaN(num) && num >= 1 && num <= combinedSources.length) {
           citedIndices.add(num - 1);
