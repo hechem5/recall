@@ -1,6 +1,14 @@
-export async function synthesizeAnswer(query: string, contextChunks: { sourceId: string, content: string, title?: string, url?: string, savedAt?: string, isRecent?: boolean }[]): Promise<string> {
+export async function synthesizeAnswer(query: string, contextChunks: { sourceId: string, content: string, type?: string, title?: string, url?: string, savedAt?: string, isRecent?: boolean }[]): Promise<string> {
+  const typeLabels: Record<string, string> = {
+    highlight: 'Highlighted text snippet',
+    url: 'Saved webpage',
+    file: 'Uploaded document',
+    text: 'Text note',
+  };
+
   const contextBlock = contextChunks.map((c, i) => {
     let text = `[${i + 1}] Source: ${c.title || c.url || 'Unknown'}`;
+    if (c.type) text += ` (Type: ${typeLabels[c.type] || c.type})`;
     if (c.savedAt) text += ` (Saved: ${c.savedAt})`;
     if (c.isRecent) text += ` (RECENTLY SAVED)`;
     text += `\nContent:\n${c.content}`;
@@ -14,9 +22,10 @@ STRICT RULES — you MUST follow all of these without exception:
 2. If the memories contain the answer, provide it IMMEDIATELY. DO NOT start your response with "I don't have that saved" and then correct yourself. DO NOT use conversational fillers.
 3. If, and ONLY if, the memories completely lack the answer, reply with exactly: "I don't have that saved in your memory."
 4. DO NOT provide unsolicited information. If the user asks for ONE specific thing (e.g. "the last YouTube video"), DO NOT mention other unrelated items (e.g. PDFs or other links).
-5. For "last saved" or "most recent" questions, pay close attention to sources marked as (RECENTLY SAVED).
-6. Always cite the exact source you used by bolding the source name and appending the citation number, for example: **Source Name** [1]. (Do not write [Source 1], just write [1]).
-7. If you mention a website or a URL in your answer, YOU MUST format it as a clickable markdown link (e.g., [Website Name](https://example.com)).`;
+5. Pay attention to the (Type: ...) label on each memory — if the user asks specifically about a 'highlight' or 'highlighted text,' only consider memories labeled as a Highlighted text snippet.
+6. For "last saved" or "most recent" questions, pay close attention to sources marked as (RECENTLY SAVED).
+7. Always cite the exact source you used by bolding the source name and appending the citation number, for example: **Source Name** [1]. (Do not write [Source 1], just write [1]).
+8. If you mention a website or a URL in your answer, YOU MUST format it as a clickable markdown link (e.g., [Website Name](https://example.com)).`;
 
   const userPrompt = `User's question: "${query}"
 
