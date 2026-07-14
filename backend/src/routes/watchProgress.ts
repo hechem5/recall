@@ -157,10 +157,28 @@ router.get('/', async (req, res) => {
         ...(isFavoritesOnly ? { isFavorite: true } : {})
       },
       orderBy: { updatedAt: 'desc' },
-      take: 20
+      take: 100
     });
 
-    return res.json(records);
+    const grouped: typeof records = [];
+    for (const record of records) {
+      const alreadyExists = grouped.find(g => {
+        try {
+          if (!g.url || !record.url) return false;
+          const u1 = new URL(g.url);
+          const u2 = new URL(record.url);
+          return u1.hostname === u2.hostname && isSameShow(g.title, record.title);
+        } catch {
+          return false;
+        }
+      });
+      if (!alreadyExists) {
+        grouped.push(record);
+        if (grouped.length >= 20) break;
+      }
+    }
+
+    return res.json(grouped);
   } catch (error) {
     console.error('Error fetching watch progress:', error);
     return res.status(500).json({ error: 'Failed to fetch watch progress' });
