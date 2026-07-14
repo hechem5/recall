@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import ingestRouter from './routes/ingest';
 import searchRouter from './routes/search';
 import jobsRouter from './routes/jobs';
+import authRouter from './routes/auth';
 import path from 'path';
 
 dotenv.config({ path: '../.env' }); // Assuming root .env
@@ -40,16 +41,31 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Protect all other routes
+import jwt from 'jsonwebtoken';
+
+app.use('/auth', authRouter);
+
+// Protect all other routes with JWT
 app.use('/api', (req, res, next) => {
   const authHeader = req.headers.authorization;
-  // Let jobs route handle its own auth (since it uses CRON_SECRET)
+  // Let jobs route handle its own auth
   if (req.path.startsWith('/jobs/weekly-digest')) return next();
   
-  if (authHeader !== `Bearer ${process.env.APP_PASSWORD}`) {
-    return res.status(401).json({ error: 'Unauthorized backend access' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or invalid authorization header' });
   }
-  next();
+
+  const token = authHeader.split(' ')[1];
+  const JWT_SECRET = process.env.SESSION_SECRET || "fallback-secret-key-for-jwt";
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { safeId: string, deviceId: string };
+    // @ts-ignore - inject user info into request
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 });
 
 app.use('/api/ingest', ingestRouter);

@@ -8,8 +8,20 @@ datasource db {
   extensions = [vector]
 }
 
+model Safe {
+  id           String      @id @default(cuid())
+  passwordHash String
+  deviceId     String
+  createdAt    DateTime    @default(now())
+  sources      Source[]
+  tags         Tag[]
+  digests      Digest[]
+}
+
 model Source {
   id           String      @id @default(cuid())
+  safeId       String
+  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
   type         String      // "text", "url", "pdf", "file"
   title        String?
   originalUrl  String?
@@ -31,8 +43,12 @@ model Chunk {
 
 model Tag {
   id           String      @id @default(cuid())
-  name         String      @unique
+  safeId       String
+  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  name         String
   sources      SourceTag[]
+
+  @@unique([safeId, name])
 }
 
 model SourceTag {
@@ -46,6 +62,8 @@ model SourceTag {
 
 model Digest {
   id           String      @id @default(cuid())
+  safeId       String
+  safe         Safe        @relation(fields: [safeId], references: [id], onDelete: Cascade)
   content      String
   createdAt    DateTime    @default(now())
 }

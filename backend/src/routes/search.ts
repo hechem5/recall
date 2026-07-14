@@ -8,26 +8,30 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const q = req.query.q as string;
-    if (!q) {
-      return res.status(400).json({ error: 'Missing query parameter q' });
-    }
+    const safeId = (req as any).user?.safeId;
+
+    if (!q) return res.status(400).json({ error: 'Missing query parameter q' });
+    if (!safeId) return res.status(401).json({ error: 'Unauthorized: Safe ID is required' });
 
     // Embed the search query
     const queryEmbedding = await embedText(q);
     const embeddingStr = `[${queryEmbedding.join(',')}]`;
 
     // Perform vector similarity search — retrieve top 15 so we have more coverage
+    // Filter by the user's Safe ID to prevent cross-tenant data leakage
     const results = await prisma.$queryRaw<any[]>`
       SELECT "Chunk".content, "Chunk"."sourceId", "Source".title, "Source"."originalUrl", "Source".type, "Source"."createdAt",
              1 - ("Chunk".embedding <=> ${embeddingStr}::vector) as similarity
       FROM "Chunk"
       JOIN "Source" ON "Chunk"."sourceId" = "Source".id
+      WHERE "Source"."safeId" = ${safeId}
       ORDER BY "Chunk".embedding <=> ${embeddingStr}::vector
       LIMIT 15;
     `;
 
     // Also grab the 5 most recently saved sources so we can answer "last X I saved" queries
     const recentSources = await prisma.source.findMany({
+      where: { safeId },
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: { id: true, title: true, originalUrl: true, type: true, createdAt: true, rawText: true }

@@ -9,10 +9,12 @@ const router = Router();
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
 const upload = multer({ storage: multer.memoryStorage() });
 
-async function ingestText(type: string, content: string, title?: string, originalUrl?: string, tags?: string[]) {
+async function ingestText(safeId: string, type: string, content: string, title?: string, originalUrl?: string, tags?: string[]) {
+  if (!safeId) throw new Error("safeId is required");
   // Save Source
   const source = await prisma.source.create({
     data: {
+      safeId,
       type,
       title,
       originalUrl,
@@ -59,6 +61,9 @@ async function ingestText(type: string, content: string, title?: string, origina
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { type, content, title, tags: tagsStr } = req.body;
+    const safeId = (req as any).user?.safeId;
+    if (!safeId) return res.status(401).json({ error: 'Unauthorized: Safe ID is required' });
+
     let tags: string[] = [];
     if (tagsStr) {
       try { tags = JSON.parse(tagsStr); } catch (e) { tags = [tagsStr]; }
@@ -117,7 +122,7 @@ router.post('/', upload.single('file'), async (req, res) => {
         extractedText = `[Scanned Document] Filename: ${req.file.originalname}`;
       }
       
-      const source = await ingestText('file', extractedText, title || req.file.originalname, downloadUrl, tags);
+      const source = await ingestText(safeId, 'file', extractedText, title || req.file.originalname, downloadUrl, tags);
       return res.json({ success: true, source });
     }
 
@@ -132,12 +137,12 @@ router.post('/', upload.single('file'), async (req, res) => {
 
       if (!extractedText) return res.status(400).json({ error: 'No text could be extracted from this URL' });
 
-      const source = await ingestText('url', extractedText, pageTitle, content, tags);
+      const source = await ingestText(safeId, 'url', extractedText, pageTitle, content, tags);
       return res.json({ success: true, source });
     }
 
     if (type === 'text') {
-      const source = await ingestText('text', content, title, undefined, tags);
+      const source = await ingestText(safeId, 'text', content, title, undefined, tags);
       return res.json({ success: true, source });
     }
 
