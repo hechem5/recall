@@ -89,6 +89,51 @@ export function ContinueWatching() {
     return `${m}:${sc}`;
   };
 
+  const favorites = records.filter(r => r.isFavorite);
+  const history = records.filter(r => !r.isFavorite).slice(0, 6);
+
+  const renderCard = (record: WatchProgress) => {
+    const progressPercent = Math.min(100, Math.max(0, record.percentComplete * 100));
+    const timeAgo = formatDistanceToNow(new Date(record.updatedAt), { addSuffix: true });
+    
+    return (
+      <div key={record.id} className="group flex flex-col p-4 border border-[#262626] bg-[#0A0A0A] hover:border-[#404040] transition-all relative">
+        <div className={`absolute top-2 right-2 flex gap-2 transition-opacity ${record.isFavorite ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+          <button 
+            onClick={() => handleFavoriteToggle(record.id, record.isFavorite)}
+            className={`p-2 transition-colors ${record.isFavorite ? 'text-[#FF3366]' : 'text-[#737373] hover:text-[#FF3366]'}`}
+            title={record.isFavorite ? "Unfavorite" : "Favorite for extension popup"}
+          >
+            {record.isFavorite ? "★" : "☆"}
+          </button>
+          <button 
+            onClick={() => handleDelete(record.id)}
+            className="p-2 text-[#737373] hover:text-[#FF3366] transition-colors"
+            title="Remove from history"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <a href={record.url} target="_blank" rel="noopener noreferrer" className="flex flex-col flex-1 min-w-0 pr-16">
+          <span className="text-sm font-medium text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors">
+            {record.title || record.url}
+          </span>
+          <span className="text-xs text-[#737373] mt-2 mb-4">
+            {formatTime(record.currentTime)} / {formatTime(record.duration)} • Updated {timeAgo}
+          </span>
+          
+          <div className="w-full bg-[#262626] h-1.5 mt-auto">
+            <div 
+              className="bg-[#FF3366] h-full" 
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </a>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full pt-16 mt-16 border-t border-[#262626]">
       <div className="mb-8">
@@ -101,49 +146,25 @@ export function ContinueWatching() {
         )}
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {records.map((record) => {
-          const progressPercent = Math.min(100, Math.max(0, record.percentComplete * 100));
-          const timeAgo = formatDistanceToNow(new Date(record.updatedAt), { addSuffix: true });
-          
-          return (
-            <div key={record.id} className="group flex flex-col p-4 border border-[#262626] bg-[#0A0A0A] hover:border-[#404040] transition-all relative">
-              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => handleFavoriteToggle(record.id, record.isFavorite)}
-                  className={`p-2 transition-colors ${record.isFavorite ? 'text-[#FF3366] opacity-100' : 'text-[#737373] hover:text-[#FF3366]'}`}
-                  title={record.isFavorite ? "Unfavorite" : "Favorite for extension popup"}
-                >
-                  {record.isFavorite ? "★" : "☆"}
-                </button>
-                <button 
-                  onClick={() => handleDelete(record.id)}
-                  className="p-2 text-[#737373] hover:text-[#FF3366] transition-colors"
-                  title="Remove from history"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <a href={record.url} target="_blank" rel="noopener noreferrer" className="flex flex-col flex-1 min-w-0 pr-16">
-                <span className="text-sm font-medium text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors">
-                  {record.title || record.url}
-                </span>
-                <span className="text-xs text-[#737373] mt-2 mb-4">
-                  {formatTime(record.currentTime)} / {formatTime(record.duration)} • Updated {timeAgo}
-                </span>
-                
-                <div className="w-full bg-[#262626] h-1.5 mt-auto">
-                  <div 
-                    className="bg-[#FF3366] h-full" 
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </a>
-            </div>
-          );
-        })}
-      </div>
+      {favorites.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[#FF3366] mb-4 border-l-2 border-[#FF3366] pl-3">Pinned Shows</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {favorites.map(renderCard)}
+          </div>
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div>
+          {favorites.length > 0 && (
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#737373] mb-4 border-l-2 border-[#262626] pl-3">History</h3>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {history.map(renderCard)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
