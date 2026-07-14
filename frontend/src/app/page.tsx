@@ -91,19 +91,21 @@ export default function LandingPage() {
       </section>
 
       {/* Extension Superpowers */}
-      <section className="border-b border-[#262626] bg-[#000000]">
+      <section className="border-b border-[#262626] bg-[#0A0A0A]">
         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#262626]">
           
-          <div className="p-12 hover:bg-[#0A0A0A] transition-colors flex flex-col">
-            <div className="text-[#E5E5E5] font-bold text-lg mb-2 tracking-widest uppercase">Highlight to Save</div>
-            <p className="text-xs text-[#737373] leading-relaxed mt-4">
+          <div className="p-12 hover:bg-[#111111] transition-colors flex flex-col">
+            <div className="text-[#FF3366] font-bold text-2xl mb-6">04.</div>
+            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Highlight to Save</h3>
+            <p className="text-xs text-[#737373] leading-relaxed">
               Don't need the whole article? Just highlight any text on any website, right-click, and hit <span className="text-[#FF3366]">"Save to Recall."</span> It instantly stores the exact quote and its source URL so your AI can cite it perfectly later.
             </p>
           </div>
 
-          <div className="p-12 hover:bg-[#0A0A0A] transition-colors flex flex-col">
-            <div className="text-[#E5E5E5] font-bold text-lg mb-2 tracking-widest uppercase">Continue Watching</div>
-            <p className="text-xs text-[#737373] leading-relaxed mt-4">
+          <div className="p-12 hover:bg-[#111111] transition-colors flex flex-col">
+            <div className="text-[#FF3366] font-bold text-2xl mb-6">05.</div>
+            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Continue Watching</h3>
+            <p className="text-xs text-[#737373] leading-relaxed">
               Never forget which episode you were on. With Smart Saves enabled, the extension passively remembers where you left off in videos across the web, letting you pin your current shows directly in your browser toolbar.
             </p>
           </div>
