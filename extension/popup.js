@@ -42,6 +42,21 @@ document.addEventListener('DOMContentLoaded', () => {
       let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab || !tab.url) throw new Error("Cannot access tab URL");
 
+      // Extract the fully rendered text directly from the browser tab
+      // to bypass Javascript/SPA loading issues and Captchas
+      let pageText = "";
+      try {
+        const injection = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => document.body.innerText
+        });
+        if (injection && injection[0] && injection[0].result) {
+          pageText = injection[0].result;
+        }
+      } catch (err) {
+        console.warn("Could not inject script to extract text", err);
+      }
+
       const res = await fetch(`${API_URL}/api/ingest`, {
         method: 'POST',
         headers: {
@@ -50,7 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({
           type: 'url',
-          content: tab.url
+          content: tab.url,
+          title: tab.title,
+          preExtractedText: pageText
         })
       });
 

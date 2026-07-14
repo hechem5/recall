@@ -127,13 +127,18 @@ router.post('/', upload.single('file'), async (req, res) => {
     }
 
     if (type === 'url') {
-      const response = await fetch(content);
-      const html = await response.text();
-      const $ = cheerio.load(html);
-      
-      $('script, style, noscript, iframe, img, svg').remove();
-      const extractedText = $('body').text().replace(/\s+/g, ' ').trim();
-      const pageTitle = $('title').text() || title;
+      let extractedText = req.body.preExtractedText;
+      let pageTitle = title;
+
+      if (!extractedText) {
+        const response = await fetch(content);
+        const html = await response.text();
+        const $ = cheerio.load(html);
+        
+        $('script, style, noscript, iframe, img, svg').remove();
+        extractedText = $('body').text().replace(/\s+/g, ' ').trim();
+        if (!pageTitle) pageTitle = $('title').text();
+      }
 
       if (!extractedText) return res.status(400).json({ error: 'No text could be extracted from this URL' });
 
