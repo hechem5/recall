@@ -146,7 +146,15 @@ export default function UnlockPage() {
               <input 
                 type="text" 
                 value={recoveryCode}
-                onChange={(e) => setRecoveryCode(e.target.value)}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                  let formatted = '';
+                  for (let i = 0; i < val.length; i++) {
+                    if (i > 0 && i % 4 === 0) formatted += '-';
+                    formatted += val[i];
+                  }
+                  setRecoveryCode(formatted.substring(0, 14));
+                }}
                 placeholder="XXXX-XXXX-XXXX"
                 className="w-full bg-[#111111] border-b-2 border-[#FF3366] py-4 text-center text-xl tracking-widest outline-none transition-colors uppercase"
               />
