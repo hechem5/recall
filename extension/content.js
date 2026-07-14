@@ -246,7 +246,7 @@
       font-weight: bold;
       transition: opacity 0.5s;
     `;
-    toast.innerHTML = `Auto-favorited next episode ✨`;
+    toast.innerHTML = `Auto-favorited next episode`;
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
@@ -284,7 +284,7 @@
     document.body.appendChild(prompt);
 
     document.getElementById('recall-fav-yes').addEventListener('click', () => {
-      prompt.innerHTML = '<div style="font-size: 14px; padding: 4px; color: #FF3366; font-weight: bold;">Added ✨</div>';
+      prompt.innerHTML = '<div style="font-size: 14px; padding: 4px; color: #FF3366; font-weight: bold;">Added</div>';
       chrome.runtime.sendMessage({ action: "forceFavoriteWatchProgress" });
       setTimeout(() => prompt.remove(), 2000);
     });
