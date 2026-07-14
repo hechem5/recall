@@ -54,7 +54,11 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="flex-1 w-full flex justify-center md:justify-end mt-12 md:mt-0 relative z-10">
+        <div className="flex-1 w-full flex flex-col items-center md:items-end mt-12 md:mt-0 relative z-10">
+          <div className="text-[10px] font-bold tracking-widest uppercase text-[#FF3366] mb-4 bg-[#FF3366]/10 px-3 py-1 rounded-full border border-[#FF3366]/20 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF3366] animate-pulse"></span>
+            Interactive Demo
+          </div>
           <DemoSearch />
         </div>
       </section>
