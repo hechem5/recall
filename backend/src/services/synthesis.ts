@@ -27,27 +27,51 @@ ${contextBlock}
 Answer the question using ONLY the memories above. Remember: If you find the answer, state it directly without any preamble. If it's missing entirely, say exactly: "I don't have that saved in your memory."`;
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3-70b-8192",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.2,
-        max_tokens: 1024,
-      })
-    });
+    const makeRequest = async (modelName: string) => {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.2,
+          max_tokens: 1024,
+        })
+      });
+      return response;
+    };
+
+    let response = await makeRequest("llama-3.3-70b-versatile");
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("[Synthesis] Groq API error:", response.status, errorText);
-      throw new Error(`Groq API returned ${response.status}`);
+      
+      try {
+        const errObj = JSON.parse(errorText);
+        // Fallback if the model is decommissioned
+        if (errObj?.error?.code === "model_decommissioned") {
+          console.warn(`[Synthesis] Model decommissioned, falling back to secondary model...`);
+          response = await makeRequest("llama-3.1-8b-instant");
+          
+          if (!response.ok) {
+            const fallbackError = await response.text();
+            console.error("[Synthesis] Fallback Groq API error:", response.status, fallbackError);
+            throw new Error(`Groq API fallback returned ${response.status}`);
+          }
+        } else {
+          throw new Error(`Groq API returned ${response.status}: ${errObj?.error?.message || 'Unknown error'}`);
+        }
+      } catch (parseError) {
+        // If it's not JSON or another error occurred parsing/falling back
+        throw new Error(`Groq API returned ${response.status}`);
+      }
     }
 
     const data = await response.json();

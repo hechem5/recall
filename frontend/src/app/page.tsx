@@ -96,24 +96,24 @@ export default function LandingPage() {
           <div className="flex gap-6">
             <div className="text-[#262626] font-bold text-xl">01</div>
             <div>
-              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Install from Source</h4>
-              <p className="text-xs text-[#737373]">Load the unpacked extension from the repository via chrome://extensions.</p>
+              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Add to Browser</h4>
+              <p className="text-xs text-[#737373]">Download the Recall extension folder, open <span className="text-[#E5E5E5]">chrome://extensions</span>, enable "Developer mode", and load the folder.</p>
             </div>
           </div>
           
           <div className="flex gap-6">
             <div className="text-[#262626] font-bold text-xl">02</div>
             <div>
-              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Configure URL</h4>
-              <p className="text-xs text-[#737373]">Set the Backend API URL to your deployed Render instance in the extension options.</p>
+              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Link Your Safe</h4>
+              <p className="text-xs text-[#737373]">Right-click the Recall icon, open Options, and paste your personal server link (e.g., your Render URL).</p>
             </div>
           </div>
 
           <div className="flex gap-6">
             <div className="text-[#262626] font-bold text-xl">03</div>
             <div>
-              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Authenticate</h4>
-              <p className="text-xs text-[#737373]">Enter your Vault Password into the extension. It will generate a hardware signature and bind to your safe.</p>
+              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Secure Access</h4>
+              <p className="text-xs text-[#737373]">Type your vault password. Your browser is now cryptographically locked to your safe and ready to save memories with one click.</p>
             </div>
           </div>
         </div>
