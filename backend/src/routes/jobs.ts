@@ -103,7 +103,13 @@ router.get('/digests', async (req, res) => {
     });
 
     const enrichedDigests = await Promise.all(digests.map(async (digest) => {
-      let orphanedSources = [];
+      let orphanedSources: {
+        id: string;
+        title: string | null;
+        type: string;
+        createdAt: Date;
+        originalUrl: string | null;
+      }[] = [];
       if (digest.orphanedSourceIds) {
         try {
           const ids = JSON.parse(digest.orphanedSourceIds);

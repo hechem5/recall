@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 
 const secret = process.env.SESSION_SECRET;
 
@@ -8,7 +8,7 @@ if (!secret || secret.length < 32) {
 
 export const JWT_SECRET = secret;
 
-export const signToken = (payload: object, expiresIn: string | number = '30d') => {
+export const signToken = (payload: object, expiresIn: SignOptions['expiresIn'] = '30d') => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };
 
