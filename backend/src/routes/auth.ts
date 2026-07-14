@@ -155,8 +155,8 @@ router.post("/regenerate-recovery-codes", async (req, res) => {
       return res.status(401).json({ error: 'Missing or invalid authorization header' });
     }
 
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as { safeId: string };
+    const token = authHeader.split(' ')[1] as string;
+    const decoded = jwt.verify(token, JWT_SECRET as string) as unknown as { safeId: string };
     const safeId = decoded.safeId;
 
     // Delete unused codes
