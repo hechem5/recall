@@ -65,9 +65,9 @@ Answer the question using ONLY the memories above. Remember: If you find the ans
       
       try {
         const errObj = JSON.parse(errorText);
-        // Fallback if the model is decommissioned
-        if (errObj?.error?.code === "model_decommissioned") {
-          console.warn(`[Synthesis] Model decommissioned, falling back to secondary model...`);
+        // Fallback if the model is decommissioned or if we hit a rate limit
+        if (errObj?.error?.code === "model_decommissioned" || errObj?.error?.code === "rate_limit_exceeded" || response.status === 429) {
+          console.warn(`[Synthesis] Model unavailable (decommissioned or rate limited), falling back to secondary model...`);
           response = await makeRequest("llama-3.1-8b-instant");
           
           if (!response.ok) {
