@@ -1,0 +1,51 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+model Source {
+  id           String      @id @default(cuid())
+  type         String      // "text", "url", "pdf", "file"
+  title        String?
+  originalUrl  String?
+  rawText      String
+  createdAt    DateTime    @default(now())
+  chunks       Chunk[]
+  tags         SourceTag[]
+}
+
+model Chunk {
+  id           String      @id @default(cuid())
+  sourceId     String
+  source       Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  content      String
+  chunkIndex   Int
+  embedding    Unsupported("vector(768)")?
+  createdAt    DateTime    @default(now())
+}
+
+model Tag {
+  id           String      @id @default(cuid())
+  name         String      @unique
+  sources      SourceTag[]
+}
+
+model SourceTag {
+  sourceId     String
+  tagId        String
+  source       Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  tag          Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([sourceId, tagId])
+}
+
+model Digest {
+  id           String      @id @default(cuid())
+  content      String
+  createdAt    DateTime    @default(now())
+}

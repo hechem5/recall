@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recall</title>
+  <link rel="stylesheet" href="tailwind.css">
+  <script src="marked.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      width: 400px;
+      min-height: 200px;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .markdown-body a {
+      color: #FF3366;
+      text-decoration: none;
+    }
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="bg-[#0A0A0A] text-[#E5E5E5]">
+  
+  <!-- Setup State -->
+  <div id="setupView" class="hidden p-6 flex flex-col items-center text-center space-y-6">
+    <h1 class="text-2xl font-bold tracking-widest uppercase">Recall<span class="text-[#FF3366]">_</span></h1>
+    <p class="text-sm text-[#737373]">You haven't set this up yet.</p>
+    <button id="setupBtn" class="text-sm font-bold tracking-widest uppercase text-[#FF3366] hover:text-[#E5E5E5] transition-colors border border-[#FF3366] px-4 py-2 hover:bg-[#FF3366]">
+      Set up Recall
+    </button>
+  </div>
+
+  <!-- Main State -->
+  <div id="mainView" class="hidden p-6 flex flex-col space-y-6">
+    <div class="flex justify-between items-center border-b border-[#262626] pb-4">
+      <h1 class="text-xl font-bold tracking-widest uppercase">Recall<span class="text-[#FF3366]">_</span></h1>
+      <button id="saveTabBtn" class="text-xs font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors">
+        [ Save Tab ]
+      </button>
+    </div>
+
+    <!-- Quick Save Status -->
+    <div id="saveStatus" class="hidden text-xs text-[#FF3366] tracking-widest uppercase text-center"></div>
+
+    <form id="searchForm" class="flex flex-col space-y-4">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search Archive..." 
+        class="w-full bg-transparent border-b border-[#262626] focus:border-[#FF3366] py-2 text-sm outline-none transition-colors"
+        required
+      />
+    </form>
+
+    <div id="loadingIndicator" class="hidden text-xs text-[#737373] tracking-widest uppercase text-center animate-pulse">
+      SEARCHING...
+    </div>
+
+    <div id="resultsContainer" class="hidden flex flex-col space-y-4">
+      <div class="text-xs font-bold text-[#FF3366] tracking-widest uppercase">Answer</div>
+      <div id="answerContent" class="markdown-body text-sm leading-relaxed text-[#E5E5E5]"></div>
+      
+      <div class="text-xs font-bold text-[#737373] tracking-widest uppercase mt-4 border-t border-[#262626] pt-4">Sources</div>
+      <div id="sourcesList" class="flex flex-col space-y-2"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

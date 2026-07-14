@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recall Options</title>
+  <link rel="stylesheet" href="tailwind.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+    body {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-[#0A0A0A] text-[#E5E5E5] min-h-screen p-8 flex justify-center">
+  <div class="w-full max-w-2xl border border-[#262626] p-8 flex flex-col space-y-8">
+    <div class="space-y-4">
+      <h1 class="text-4xl font-bold tracking-widest uppercase">
+        Recall<span class="text-[#FF3366]">_</span>
+      </h1>
+      <p class="text-xs text-[#737373] tracking-widest uppercase border-b border-[#262626] pb-4">
+        Extension Configuration
+      </p>
+    </div>
+
+    <div class="p-4 border border-[#FF3366]/30 bg-[#FF3366]/10 text-sm">
+      <strong class="text-[#FF3366] uppercase tracking-widest">Warning:</strong>
+      <p class="mt-2 text-[#E5E5E5]">
+        This extension stores your App Password in standard local storage to allow automatic background saving. This is a deliberate tradeoff for convenience on personal devices. To ensure security, do not install this extension on shared computers. If you uninstall the extension, this data is cleared.
+      </p>
+    </div>
+
+    <form id="options-form" class="space-y-8">
+      <div class="space-y-4">
+        <label class="block text-xs font-bold tracking-widest uppercase text-[#737373]">
+          Backend API URL
+        </label>
+        <input 
+          type="url" 
+          id="apiUrl" 
+          placeholder="http://localhost:3001" 
+          class="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-4 outline-none transition-colors"
+          required
+        />
+        <p class="text-xs text-[#404040]">
+          Default is <span class="text-[#737373]">http://localhost:3001</span>. 
+          <span class="text-[#FF3366]">IMPORTANT:</span> Update this to your real Render/Vercel URL once deployed!
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <label class="block text-xs font-bold tracking-widest uppercase text-[#737373]">
+          App Password
+        </label>
+        <input 
+          type="password" 
+          id="appPassword" 
+          placeholder="Enter your APP_PASSWORD" 
+          class="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-4 outline-none transition-colors"
+          required
+        />
+      </div>
+
+      <div class="flex items-center justify-between pt-4">
+        <button 
+          type="submit" 
+          class="text-sm font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
+        >
+          [ Save Settings ]
+        </button>
+        <span id="statusMessage" class="text-xs text-[#FF3366] tracking-widest uppercase hidden">
+          Settings Saved!
+        </span>
+      </div>
+    </form>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
