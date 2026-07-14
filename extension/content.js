@@ -7,7 +7,7 @@
       } else if (request.status === "prompt_user") {
         chrome.storage.local.get(['dismissedFavorites'], (res) => {
           const dismissed = res.dismissedFavorites || [];
-          if (!dismissed.includes(window.location.hostname)) {
+          if (!dismissed.includes(window.location.href)) {
             showNewFavoritePrompt();
           }
         });
@@ -319,7 +319,7 @@
       prompt.remove();
       chrome.storage.local.get(['dismissedFavorites'], (res) => {
         const arr = res.dismissedFavorites || [];
-        arr.push(window.location.hostname);
+        arr.push(window.location.href);
         chrome.storage.local.set({ dismissedFavorites: arr });
       });
     });
