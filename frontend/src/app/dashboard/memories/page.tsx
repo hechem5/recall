@@ -51,6 +51,11 @@ export default function MemoriesPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  };
+
   return (
     <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center">
       {/* Top Bar */}
@@ -58,12 +63,26 @@ export default function MemoriesPage() {
         <Link href="/" className="text-xl font-bold tracking-widest uppercase hover:text-[#FF3366] transition-colors cursor-pointer text-decoration-none">
           Recall<span className="text-[#FF3366]">_</span>
         </Link>
-        <Link 
-          href="/dashboard"
-          className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"
-        >
-          [ BACK TO SEARCH ]
-        </Link>
+        <div className="flex items-center space-x-6">
+          <button 
+            onClick={() => router.push('/dashboard')}
+            className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors hidden md:block"
+          >
+            [ ARCHIVE ]
+          </button>
+          <button 
+            onClick={() => router.push('/dashboard/settings')}
+            className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
+          >
+            [ SETTINGS ]
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"
+          >
+            [ LOGOUT ]
+          </button>
+        </div>
       </div>
 
       <div className="w-full max-w-5xl flex flex-col space-y-8">

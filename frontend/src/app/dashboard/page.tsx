@@ -57,6 +57,12 @@ export default function Home() {
             [ MANAGE MEMORIES ]
           </button>
           <button 
+            onClick={() => router.push('/dashboard/settings')}
+            className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
+          >
+            [ SETTINGS ]
+          </button>
+          <button 
             onClick={handleLogout}
             className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"
           >
