@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = function() {
           chrome.downloads.download({
-            url: reader.result as string,
+            url: reader.result,
             filename: `recall-vault-export-${new Date().toISOString().split('T')[0]}.json`,
             saveAs: true
           });
