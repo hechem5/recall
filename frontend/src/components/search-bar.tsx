@@ -111,21 +111,21 @@ export function SearchBar() {
                         </a>
                       ) : source.type === 'text' ? (
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-medium text-[#E5E5E5] truncate">
+                          <div className="text-sm font-medium text-[#E5E5E5] truncate">
                             {source.title || "Untitled Note"}
-                          </span>
-                          <span className="text-xs text-[#737373] mt-1 italic truncate">
+                          </div>
+                          <div className="text-xs text-[#737373] mt-1 italic truncate">
                             (Saved: {source.savedAt || "Unknown date"})
-                          </span>
+                          </div>
                         </div>
                       ) : (
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-medium text-[#E5E5E5] truncate">
+                          <div className="text-sm font-medium text-[#E5E5E5] truncate">
                             {source.title || "Untitled Document"}
-                          </span>
-                          <span className="text-xs text-[#737373] mt-1 italic truncate">
+                          </div>
+                          <div className="text-xs text-[#737373] mt-1 italic truncate">
                             (Text only - uploaded before download update)
-                          </span>
+                          </div>
                         </div>
                       )}
                     </div>

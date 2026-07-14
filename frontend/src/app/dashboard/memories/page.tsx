@@ -92,21 +92,21 @@ export default function MemoriesPage() {
         ) : (
           <div className="grid gap-4 mt-8">
             {memories.map((memory) => (
-              <div key={memory.id} className="flex justify-between items-center border border-[#262626] p-4 hover:border-[#FF3366] transition-colors group bg-[#0A0A0A]">
-                <div className="flex flex-col overflow-hidden mr-4 min-w-0">
+              <div key={memory.id} className="flex justify-between items-center border border-[#262626] p-4 hover:border-[#FF3366] transition-colors group bg-[#0A0A0A] min-w-0">
+                <div className="flex-1 flex flex-col overflow-hidden mr-4 min-w-0">
                   <div className="text-xs text-[#737373] mb-1 font-bold tracking-wider uppercase">
                     {memory.type === 'url' ? 'Website' : memory.type === 'highlight' ? 'Highlight' : memory.type === 'text' ? 'Text Note' : 'Document'}
                   </div>
                   <div className="truncate w-full">
                     {memory.type === 'highlight' ? (
-                      <span className="text-sm font-medium text-[#E5E5E5] truncate">
+                      <div className="text-sm font-medium text-[#E5E5E5] truncate">
                         "{memory.rawText?.split('\n\n--- Context ---')[0] || "Highlighted snippet"}"
                         {memory.originalUrl && (
                           <a href={memory.originalUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-xs text-[#FF3366] hover:underline underline-offset-2">
                             (Source)
                           </a>
                         )}
-                      </span>
+                      </div>
                     ) : memory.originalUrl ? (
                       <a href={memory.originalUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors underline decoration-[#262626] underline-offset-4 group-hover:decoration-[#FF3366]">
                         {memory.title || memory.originalUrl}
