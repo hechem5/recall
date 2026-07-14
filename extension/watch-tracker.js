@@ -3,6 +3,7 @@ let lastReportedTime = -1;
 let lastReportedUrl = "";
 let hasCheckedStatus = false;
 let currentTrackedUrl = "";
+let wasPaused = true;
 
 // Initialize consent
 chrome.runtime.sendMessage({ action: "getConsent" }, (response) => {
@@ -33,11 +34,11 @@ function reportProgress(video, force = false) {
 
   const currentUrl = window.location.href;
   
-  // Only report if we changed URLs or moved by > 10 seconds since last report, or forced
+  // Only report if we changed URLs or moved by > 5 seconds since last report, or forced
   const timeDelta = Math.abs(video.currentTime - lastReportedTime);
   const urlChanged = currentUrl !== lastReportedUrl;
   
-  if (!force && !urlChanged && timeDelta < 10) {
+  if (!force && !urlChanged && timeDelta < 5) {
     return; // Throttle
   }
 
@@ -56,22 +57,30 @@ function reportProgress(video, force = false) {
 function startWatchTracker() {
   setInterval(() => {
     const video = getBestVideo();
-    if (video && !video.paused && video.duration >= 300) {
+    if (video && video.duration >= 300) {
       if (window.location.href !== currentTrackedUrl) {
         currentTrackedUrl = window.location.href;
         hasCheckedStatus = false;
       }
 
-      if (!hasCheckedStatus) {
-        hasCheckedStatus = true;
-        chrome.runtime.sendMessage({
-          action: "checkVideoStatus",
-          url: window.location.href,
-          title: document.title
-        });
-      }
+      const isPaused = video.paused;
+      const justPaused = !wasPaused && isPaused;
+      wasPaused = isPaused;
 
-      reportProgress(video, false);
+      // If it's playing, or they literally just hit pause right now:
+      if (!isPaused || justPaused) {
+        if (!hasCheckedStatus) {
+          hasCheckedStatus = true;
+          chrome.runtime.sendMessage({
+            action: "checkVideoStatus",
+            url: window.location.href,
+            title: document.title
+          });
+        }
+
+        // If they just hit pause, bypass the throttle (force = true) so we save the EXACT second!
+        reportProgress(video, justPaused);
+      }
     }
   }, 2000);
 
