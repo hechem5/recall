@@ -108,7 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
   proceedModalBtn.addEventListener('click', () => {
     recoveryCodesModal.classList.add('hidden');
     recoveryCodesModal.classList.remove('flex');
-    showStatus('Vault Created & Device Trusted!');
+    
+    // Auto-login and show success screen
+    form.classList.add('hidden');
+    document.getElementById('successScreen').classList.remove('hidden');
+    document.getElementById('successScreen').classList.add('flex');
   });
 
   // Save settings (Unlock)
