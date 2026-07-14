@@ -123,6 +123,7 @@ router.post('/', async (req, res) => {
         currentTime,
         duration,
         percentComplete,
+        updatedAt: new Date(),
         ...(forceFavorite ? { isFavorite: true } : {})
       },
       create: {
