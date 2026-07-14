@@ -76,9 +76,9 @@ Answer the question using ONLY the memories above. Remember: If you find the ans
             const fallbackError = await response.text();
             console.error("[Synthesis] Fallback Groq API error:", response.status, fallbackError);
             
-            console.warn("[Synthesis] Groq fallback failed, executing final fallback to Gemini 1.5 Flash...");
+            console.warn("[Synthesis] Groq fallback failed, executing final fallback to Gemini Flash Latest...");
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-            const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const geminiModel = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
             const geminiResult = await geminiModel.generateContent({
               contents: [{ role: "user", parts: [{ text: userPrompt }] }],
               systemInstruction: systemPrompt
