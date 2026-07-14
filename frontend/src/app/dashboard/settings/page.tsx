@@ -22,7 +22,7 @@ export default function Settings() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const res = await fetch("/api/proxy/auth/regenerate-recovery-codes", { method: 'POST' });
+      const res = await fetch("/api/auth/regenerate", { method: 'POST' });
       const data = await res.json();
       if (!res.ok) {
         setErrorMsg(data.error || "Failed to generate codes");

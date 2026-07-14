@@ -6,31 +6,28 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001";
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    if (!session.isLoggedIn || !session.token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!session.isLoggedIn) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const res = await fetch(`${BACKEND_URL}/auth/regenerate-recovery-codes`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.token}`
-      }
+    const backendUrl = `${BACKEND_URL}/auth/regenerate-recovery-codes`;
+    
+    const headers = new Headers();
+    headers.set("Authorization", `Bearer ${session.token}`);
+
+    const res = await fetch(backendUrl, {
+      method: "POST",
+      headers,
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json({ error: data.error || "Failed to regenerate codes" }, { status: res.status });
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error(`Backend did not return JSON. Status: ${res.status}, Body: ${text.substring(0, 50)}`);
     }
-
-    // Reset the remaining codes count in session
-    session.remainingRecoveryCodes = 10;
-    await session.save();
-
-    return NextResponse.json({ success: true, recoveryCodes: data.recoveryCodes });
-  } catch (err) {
-    console.error("Frontend Auth Regenerate Error:", err);
-    return NextResponse.json({ error: "Server connection failed" }, { status: 500 });
+    return NextResponse.json(data, { status: res.status });
+  } catch (error: any) {
+    console.error("[Regenerate Error]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
