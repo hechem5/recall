@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
 
 interface Memory {
@@ -14,6 +15,7 @@ interface Memory {
 }
 
 export default function MemoriesPage() {
+  const router = useRouter();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
