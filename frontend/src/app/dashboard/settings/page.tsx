@@ -9,6 +9,7 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleLogout = async () => {
     await fetch("/api/auth", { method: "DELETE" });
@@ -16,9 +17,12 @@ export default function Settings() {
     router.refresh();
   };
 
-  const generateCodes = async () => {
-    if (!confirm("Are you sure? This will instantly invalidate all your old recovery codes.")) return;
-    
+  const requestGenerateCodes = () => {
+    setShowConfirm(true);
+  };
+
+  const confirmGenerateCodes = async () => {
+    setShowConfirm(false);
     setLoading(true);
     setErrorMsg(null);
     try {
@@ -76,7 +80,7 @@ export default function Settings() {
           </div>
 
           <button
-            onClick={generateCodes}
+            onClick={requestGenerateCodes}
             disabled={loading}
             className="w-full bg-[#E5E5E5] text-black py-4 font-bold tracking-widest uppercase hover:bg-white transition-colors disabled:opacity-50"
           >
@@ -112,6 +116,31 @@ export default function Settings() {
           )}
         </div>
       </div>
+
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#0A0A0A] border border-[#262626] p-8 max-w-md w-full shadow-2xl">
+            <h3 className="text-[#FF3366] text-xl font-bold uppercase tracking-widest mb-4">Warning</h3>
+            <p className="text-[#E5E5E5] text-sm uppercase leading-relaxed mb-8">
+              Are you sure? This will instantly invalidate all your old recovery codes. If you have any unused codes, they will no longer work.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 bg-transparent border border-[#404040] text-[#a3a3a3] py-3 font-bold tracking-widest uppercase hover:text-white hover:border-[#737373] transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={confirmGenerateCodes}
+                className="flex-1 bg-[#FF3366] text-white py-3 font-bold tracking-widest uppercase hover:bg-red-500 transition-colors"
+              >
+                PROCEED
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
