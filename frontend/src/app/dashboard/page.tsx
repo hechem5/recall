@@ -18,9 +18,9 @@ export default function Home() {
       
       {/* Top Bar */}
       <div className="w-full max-w-5xl flex justify-between items-center mb-24 border-b border-[#262626] pb-4">
-        <div className="text-xl font-bold tracking-widest uppercase">
+        <a href="/" className="text-xl font-bold tracking-widest uppercase hover:text-[#FF3366] transition-colors cursor-pointer text-decoration-none">
           Recall<span className="text-[#FF3366]">_</span>
-        </div>
+        </a>
         <button 
           onClick={handleLogout}
           className="text-xs tracking-widest uppercase hover:text-[#FF3366] transition-colors"

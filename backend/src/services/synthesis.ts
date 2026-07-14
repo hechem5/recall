@@ -15,7 +15,7 @@ STRICT RULES — you MUST follow all of these without exception:
 3. If, and ONLY if, the memories completely lack the answer, reply with exactly: "I don't have that saved in your memory."
 4. DO NOT provide unsolicited information. If the user asks for ONE specific thing (e.g. "the last YouTube video"), DO NOT mention other unrelated items (e.g. PDFs or other links).
 5. For "last saved" or "most recent" questions, pay close attention to sources marked as (RECENTLY SAVED).
-6. Always cite the exact source you used with [1], [2], etc. (Do not write [Source 1], just write [1]).
+6. Always cite the exact source you used by bolding the source name and appending the citation number, for example: **Source Name** [1]. (Do not write [Source 1], just write [1]).
 7. If you mention a website or a URL in your answer, YOU MUST format it as a clickable markdown link (e.g., [Website Name](https://example.com)).`;
 
   const userPrompt = `User's question: "${query}"
