@@ -10,6 +10,7 @@ interface Source {
   title?: string;
   url?: string;
   type?: string;
+  savedAt?: string;
 }
 
 export function SearchBar() {
