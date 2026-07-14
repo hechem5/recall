@@ -2,7 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import prisma from "../prisma";
 import { signToken, verifyToken } from "../lib/jwt";
 
@@ -23,7 +23,7 @@ const recoveryLimiter = rateLimit({
 const unlockIpDeviceLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // 10 attempts
-  keyGenerator: (req) => `${req.ip}_${req.body.deviceToken || 'no-device'}`,
+  keyGenerator: (req) => `${ipKeyGenerator(req.ip || '')}_${req.body.deviceToken || 'no-device'}`,
   message: { error: "Too many login attempts. For your security, please wait 15 minutes before trying again." }
 });
 
