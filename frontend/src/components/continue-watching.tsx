@@ -82,6 +82,13 @@ export function ContinueWatching() {
   if (loading) return null;
   if (records.length === 0) return null;
 
+  const formatTime = (s: number) => {
+    if (!s || isNaN(s)) return '00:00';
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sc = Math.floor(s % 60).toString().padStart(2, '0');
+    return `${m}:${sc}`;
+  };
+
   return (
     <div className="w-full pt-16 mt-16 border-t border-[#262626]">
       <div className="mb-8">
@@ -123,7 +130,7 @@ export function ContinueWatching() {
                   {record.title || record.url}
                 </span>
                 <span className="text-xs text-[#737373] mt-2 mb-4">
-                  {Math.round(record.currentTime / 60)}m / {Math.round(record.duration / 60)}m watched • Updated {timeAgo}
+                  {formatTime(record.currentTime)} / {formatTime(record.duration)} • Updated {timeAgo}
                 </span>
                 
                 <div className="w-full bg-[#262626] h-1.5 mt-auto">
