@@ -5,8 +5,13 @@ import { getSession } from "@/lib/session";
 export async function middleware(request: NextRequest) {
   const session = await getSession();
 
-  // Protect all routes except /unlock and /api/auth
-  if (!session.isLoggedIn && !request.nextUrl.pathname.startsWith('/unlock') && !request.nextUrl.pathname.startsWith('/api/auth')) {
+  // Allow access to the landing page, unlock page, and auth api for unauthenticated users
+  const isPublicRoute = 
+    request.nextUrl.pathname === '/' || 
+    request.nextUrl.pathname.startsWith('/unlock') || 
+    request.nextUrl.pathname.startsWith('/api/auth');
+
+  if (!session.isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/unlock", request.url));
   }
 
