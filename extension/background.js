@@ -160,6 +160,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (!appToken) return sendResponse({ success: false });
 
       try {
+        const finalUrl = sender.tab && sender.tab.url ? sender.tab.url : request.url;
+        const finalTitle = sender.tab && sender.tab.title ? sender.tab.title : request.title;
+
         const res = await fetch(`${API_URL}/api/watch-progress`, {
           method: "POST",
           headers: {
@@ -167,8 +170,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             "Authorization": `Bearer ${appToken}`
           },
           body: JSON.stringify({
-            url: request.url,
-            title: request.title,
+            url: finalUrl,
+            title: finalTitle,
             currentTime: request.currentTime,
             duration: request.duration
           })
