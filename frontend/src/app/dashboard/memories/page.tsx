@@ -9,6 +9,7 @@ interface Memory {
   type: string;
   title?: string;
   originalUrl?: string;
+  rawText?: string;
   createdAt: string;
 }
 
