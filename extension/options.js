@@ -124,6 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) {
         if (data.error && data.error.toLowerCase().includes('unrecognized device')) {
           if (recoveryCodeGroup) recoveryCodeGroup.classList.remove('hidden');
+          // Clear stale token so the next request is clean
+          currentDeviceToken = null;
+          chrome.storage.local.remove('deviceToken');
         }
         throw new Error(data.error || 'Authentication failed');
       }

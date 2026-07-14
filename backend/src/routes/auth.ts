@@ -101,7 +101,7 @@ router.post("/unlock", recoveryLimiter, async (req, res) => {
     }
 
     if (!safeId) {
-      return res.status(401).json({ error: "Invalid password or unrecognized device." });
+      return res.status(401).json({ error: "Unrecognized device or invalid recovery code. Please provide a valid recovery code." });
     }
 
     const safe = await prisma.safe.findUnique({ where: { id: safeId } });
