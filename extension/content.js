@@ -15,10 +15,34 @@
     }
   });
 
-  // Simple heuristic for an article or video
-  const isArticle = !!document.querySelector('article') || document.body.innerText.split(/\s+/).length > 500;
-  const isVideo = !!document.querySelector('video') || !!document.querySelector('iframe');
-  if (!isArticle && !isVideo) return;
+  const checkMedia = () => {
+    return {
+      isArticle: !!document.querySelector('article') || document.body.innerText.split(/\s+/).length > 500,
+      isVideo: !!document.querySelector('video') || !!document.querySelector('iframe')
+    };
+  };
+
+  const waitForMedia = () => new Promise((resolve) => {
+    const initial = checkMedia();
+    if (initial.isArticle || initial.isVideo) return resolve(initial);
+    
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      const current = checkMedia();
+      if (current.isArticle || current.isVideo) {
+        clearInterval(interval);
+        resolve(current);
+      } else if (attempts > 30) { // Timeout after 30 seconds
+        clearInterval(interval);
+        resolve(current);
+      }
+    }, 1000);
+  });
+
+  const media = await waitForMedia();
+  if (!media.isArticle && !media.isVideo) return;
+  const isArticle = media.isArticle;
 
   const getConsent = () => new Promise((resolve) => {
     chrome.runtime.sendMessage({ action: "getConsent" }, resolve);
