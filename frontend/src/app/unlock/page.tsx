@@ -1,26 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import fpPromise from '@fingerprintjs/fingerprintjs';
-
 import Link from 'next/link';
 
 export default function UnlockPage() {
   const [password, setPassword] = useState('');
-  const [deviceId, setDeviceId] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const [showRecoveryInput, setShowRecoveryInput] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  
+  // Modal state
+  const [recoveryCodesModal, setRecoveryCodesModal] = useState<string[] | null>(null);
+  const [savedConfirmed, setSavedConfirmed] = useState(false);
 
-  useEffect(() => {
-    const getFingerprint = async () => {
-      const fp = await fpPromise.load();
-      const result = await fp.get();
-      setDeviceId(result.visitorId);
-    };
-    getFingerprint();
-  }, []);
+  const router = useRouter();
 
   const handleAuth = async (action: 'create' | 'unlock') => {
     setError('');
@@ -30,23 +25,85 @@ export default function UnlockPage() {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, deviceId, action })
+        body: JSON.stringify({ password, recoveryCode: showRecoveryInput ? recoveryCode : undefined, action })
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error && data.error.toLowerCase().includes('unrecognized device')) {
+          setShowRecoveryInput(true);
+        }
         throw new Error(data.error || 'AUTHENTICATION FAILED');
       }
 
-      router.push('/dashboard');
-      router.refresh();
+      if (action === 'create' && data.recoveryCodes) {
+        setRecoveryCodesModal(data.recoveryCodes);
+      } else {
+        router.push('/dashboard');
+        router.refresh();
+      }
     } catch (err: any) {
       setError(err.message.toUpperCase());
     } finally {
       setLoading(false);
     }
   };
+
+  const handleModalProceed = () => {
+    if (!savedConfirmed) return;
+    setRecoveryCodesModal(null);
+    router.push('/dashboard');
+    router.refresh();
+  };
+
+  if (recoveryCodesModal) {
+    return (
+      <main className="min-h-screen bg-black text-[#E5E5E5] p-8 flex items-center justify-center font-mono">
+        <div className="max-w-2xl w-full bg-[#111111] border border-[#FF3366] p-8 md:p-12 space-y-8">
+          <div className="border-b border-[#FF3366]/30 pb-4">
+            <h2 className="text-2xl font-bold tracking-widest text-[#FF3366] uppercase">Critical: Save Recovery Codes</h2>
+            <p className="text-[#A3A3A3] text-sm mt-2">
+              Your vault is locked to this specific browser. If you lose access, clear your cookies, or log in from a new device, you MUST use one of these one-time recovery codes to regain access.
+            </p>
+            <p className="text-[#E5E5E5] font-bold text-sm mt-2 uppercase tracking-widest">
+              These will never be shown again.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {recoveryCodesModal.map((code, idx) => (
+              <div key={idx} className="bg-black border border-[#262626] p-4 text-center font-bold tracking-widest text-lg">
+                {code}
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-4 border-t border-[#262626] space-y-6">
+            <label className="flex items-start gap-4 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                checked={savedConfirmed}
+                onChange={(e) => setSavedConfirmed(e.target.checked)}
+                className="mt-1 w-4 h-4 bg-transparent border border-[#737373] checked:bg-[#FF3366] appearance-none cursor-pointer"
+              />
+              <span className="text-sm tracking-widest uppercase text-[#737373] group-hover:text-[#E5E5E5] transition-colors">
+                I confirm that I have securely saved these recovery codes. I understand that if I lose them and my browser tokens, my vault cannot be recovered.
+              </span>
+            </label>
+
+            <button 
+              onClick={handleModalProceed}
+              disabled={!savedConfirmed}
+              className="w-full bg-[#FF3366] text-black font-bold tracking-widest uppercase py-4 disabled:opacity-50 disabled:bg-[#262626] disabled:text-[#737373] transition-colors"
+            >
+              [ PROCEED TO DASHBOARD ]
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center justify-center font-mono relative">
@@ -81,6 +138,21 @@ export default function UnlockPage() {
             />
           </div>
 
+          {showRecoveryInput && (
+            <div className="space-y-4 text-center animate-in fade-in slide-in-from-top-4">
+              <label className="block text-xs font-bold tracking-widest uppercase text-[#FF3366]">
+                New Device Detected. Enter Recovery Code:
+              </label>
+              <input 
+                type="text" 
+                value={recoveryCode}
+                onChange={(e) => setRecoveryCode(e.target.value)}
+                placeholder="XXXX-XXXX-XXXX"
+                className="w-full bg-[#111111] border-b-2 border-[#FF3366] py-4 text-center text-xl tracking-widest outline-none transition-colors uppercase"
+              />
+            </div>
+          )}
+
           {error && (
             <div className="text-xs font-bold tracking-widest uppercase text-[#FF3366] text-center bg-[#FF3366]/10 border border-[#FF3366]/30 py-3">
               [ ERROR: {error} ]
@@ -90,14 +162,14 @@ export default function UnlockPage() {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button 
               onClick={() => handleAuth('unlock')}
-              disabled={loading || !password || !deviceId}
+              disabled={loading || !password || (showRecoveryInput && !recoveryCode)}
               className="w-full sm:w-1/2 border border-[#262626] hover:border-[#FF3366] text-xs font-bold tracking-widest uppercase py-4 transition-colors disabled:opacity-50 hover:text-[#FF3366]"
             >
               [ {loading ? 'PROCESSING...' : 'UNLOCK'} ]
             </button>
             <button 
               onClick={() => handleAuth('create')}
-              disabled={loading || !password || !deviceId}
+              disabled={loading || !password || showRecoveryInput}
               className="w-full sm:w-1/2 border border-[#262626] hover:border-[#E5E5E5] text-xs font-bold tracking-widest uppercase py-4 transition-colors disabled:opacity-50"
             >
               [ CREATE NEW ]
@@ -108,14 +180,13 @@ export default function UnlockPage() {
         {/* Hardware Status */}
         <div className="w-full border-t border-[#262626] mt-16 pt-8 text-center space-y-2">
           <p className="text-xs text-[#737373] tracking-widest uppercase">
-            Vault bounds to device hardware.
+            Vault bounds to device securely.
           </p>
           <p className="text-xs tracking-widest uppercase text-[#FF3366]">
-            {deviceId ? `HWID: ${deviceId.substring(0, 16)}` : 'GENERATING HARDWARE SIGNATURE...'}
+            SECURE TOKEN ACTIVE
           </p>
         </div>
       </div>
-
     </main>
   );
 }

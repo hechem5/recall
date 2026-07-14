@@ -5,6 +5,8 @@ export interface SessionData {
   isLoggedIn: boolean;
   token?: string;
   safeId?: string;
+  remainingRecoveryCodes?: number;
+  usedRecoveryCode?: boolean;
 }
 
 export const sessionOptions = {

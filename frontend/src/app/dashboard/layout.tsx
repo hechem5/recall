@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import DashboardAlerts from "./DashboardAlerts";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -8,5 +9,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/unlock");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <DashboardAlerts 
+        usedRecoveryCode={session.usedRecoveryCode} 
+        remainingRecoveryCodes={session.remainingRecoveryCodes} 
+      />
+      {children}
+    </>
+  );
 }

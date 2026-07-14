@@ -11,11 +11,32 @@ datasource db {
 model Safe {
   id           String      @id @default(cuid())
   passwordHash String
-  deviceId     String
   createdAt    DateTime    @default(now())
+
+  devices      TrustedDevice[]
+  recoveryCodes RecoveryCode[]
+
   sources      Source[]
   tags         Tag[]
   digests      Digest[]
+}
+
+model TrustedDevice {
+  id        String   @id @default(cuid())
+  safeId    String
+  safe      Safe     @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique // SHA-256 hash of the device token
+  createdAt DateTime @default(now())
+  lastUsed  DateTime @default(now())
+}
+
+model RecoveryCode {
+  id        String   @id @default(cuid())
+  safeId    String
+  safe      Safe     @relation(fields: [safeId], references: [id], onDelete: Cascade)
+  codeHash  String   @unique // SHA-256 hash of the recovery code
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Source {
