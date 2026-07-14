@@ -93,7 +93,7 @@ export default function MemoriesPage() {
           <div className="grid gap-4 mt-8">
             {memories.map((memory) => (
               <div key={memory.id} className="flex justify-between items-center border border-[#262626] p-4 hover:border-[#FF3366] transition-colors group bg-[#0A0A0A]">
-                <div className="flex flex-col overflow-hidden mr-4">
+                <div className="flex flex-col overflow-hidden mr-4 min-w-0">
                   <div className="text-xs text-[#737373] mb-1 font-bold tracking-wider uppercase">
                     {memory.type === 'url' ? 'Website' : memory.type === 'highlight' ? 'Highlight' : memory.type === 'text' ? 'Text Note' : 'Document'}
                   </div>

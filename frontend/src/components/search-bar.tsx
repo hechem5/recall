@@ -50,7 +50,7 @@ export function SearchBar() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ask a question or search..."
-            className="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-6 text-xl md:text-3xl font-medium outline-none transition-colors placeholder:text-[#404040]"
+            className="w-full bg-transparent border-b-2 border-[#262626] focus:border-[#FF3366] py-6 pr-24 md:pr-32 text-xl md:text-3xl font-medium outline-none transition-colors placeholder:text-[#404040]"
           />
           <button
             type="submit"
@@ -100,7 +100,7 @@ export function SearchBar() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {result.sources.map((source, idx) => (
-                  <div key={idx} className="flex flex-col border border-[#262626] p-4 hover:border-[#FF3366] transition-colors group bg-[#0A0A0A]">
+                  <div key={idx} className="flex flex-col border border-[#262626] p-4 hover:border-[#FF3366] transition-colors group bg-[#0A0A0A] min-w-0">
                     <div className="text-xs text-[#737373] mb-2 font-bold tracking-wider uppercase">
                       {source.type === 'url' ? 'Website' : source.type === 'text' ? 'Text Note' : 'Document'}
                     </div>
@@ -110,7 +110,7 @@ export function SearchBar() {
                           {source.title || (source.type === 'url' ? source.url : "Untitled Document")}
                         </a>
                       ) : source.type === 'text' ? (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0">
                           <span className="text-sm font-medium text-[#E5E5E5] truncate">
                             {source.title || "Untitled Note"}
                           </span>
@@ -119,7 +119,7 @@ export function SearchBar() {
                           </span>
                         </div>
                       ) : (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0">
                           <span className="text-sm font-medium text-[#E5E5E5] truncate">
                             {source.title || "Untitled Document"}
                           </span>
