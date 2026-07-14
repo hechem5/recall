@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let config = null;
 
   // Initialize
-  chrome.storage.local.get(['apiUrl', 'appPassword'], (result) => {
-    if (!result.apiUrl || !result.appPassword) {
+  chrome.storage.local.get(['apiUrl', 'appToken'], (result) => {
+    if (!result.apiUrl || !result.appToken) {
       setupView.classList.remove('hidden');
     } else {
       config = result;
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.appPassword}`
+          'Authorization': `Bearer ${config.appToken}`
         },
         body: JSON.stringify({
           type: 'url',
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch(`${config.apiUrl}/api/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${config.appPassword}`
+          'Authorization': `Bearer ${config.appToken}`
         }
       });
 

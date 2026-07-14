@@ -17,25 +17,59 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Save settings
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Ensure URL has no trailing slash
     let url = apiUrlInput.value.trim();
     if (url.endsWith('/')) {
       url = url.slice(0, -1);
     }
 
     const password = appPasswordInput.value.trim();
+    const originalBtnText = e.submitter ? e.submitter.innerText : '[ Save Settings ]';
+    
+    if (e.submitter) e.submitter.innerText = '[ Authenticating... ]';
 
-    chrome.storage.local.set({
-      apiUrl: url,
-      appPassword: password
-    }, () => {
+    try {
+      // Get Fingerprint
+      const fpPromise = window.FingerprintJS.load();
+      const fp = await fpPromise;
+      const result = await fp.get();
+      const deviceId = result.visitorId;
+
+      // Authenticate with backend
+      const res = await fetch(`${url}/auth/unlock`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, deviceId })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      // Save token to extension storage
+      chrome.storage.local.set({
+        apiUrl: url,
+        appToken: data.token,
+        appPassword: password // We can keep password if we want it to repopulate the field later
+      }, () => {
+        statusMessage.innerText = 'Vault Unlocked!';
+        statusMessage.classList.remove('hidden');
+        setTimeout(() => {
+          statusMessage.classList.add('hidden');
+        }, 3000);
+      });
+    } catch (err) {
+      statusMessage.innerText = `Error: ${err.message}`;
       statusMessage.classList.remove('hidden');
       setTimeout(() => {
         statusMessage.classList.add('hidden');
-      }, 2000);
-    });
+      }, 5000);
+    } finally {
+      if (e.submitter) e.submitter.innerText = originalBtnText;
+    }
   });
 });

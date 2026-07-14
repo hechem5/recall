@@ -13,9 +13,9 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const { apiUrl, appPassword } = await chrome.storage.local.get(['apiUrl', 'appPassword']);
+  const { apiUrl, appToken } = await chrome.storage.local.get(['apiUrl', 'appToken']);
   
-  if (!apiUrl || !appPassword) {
+  if (!apiUrl || !appToken) {
     console.error("Recall Extension not configured.");
     return;
   }
@@ -40,7 +40,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${appPassword}`
+        "Authorization": `Bearer ${appToken}`
       },
       body: JSON.stringify(payload)
     });
