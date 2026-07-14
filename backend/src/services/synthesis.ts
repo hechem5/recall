@@ -1,3 +1,5 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export async function synthesizeAnswer(query: string, contextChunks: { sourceId: string, content: string, type?: string, title?: string, url?: string, savedAt?: string, isRecent?: boolean }[]): Promise<string> {
   const typeLabels: Record<string, string> = {
     highlight: 'Highlighted text snippet',
@@ -73,7 +75,15 @@ Answer the question using ONLY the memories above. Remember: If you find the ans
           if (!response.ok) {
             const fallbackError = await response.text();
             console.error("[Synthesis] Fallback Groq API error:", response.status, fallbackError);
-            throw new Error(`Groq API fallback returned ${response.status}`);
+            
+            console.warn("[Synthesis] Groq fallback failed, executing final fallback to Gemini 1.5 Flash...");
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+            const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const geminiResult = await geminiModel.generateContent({
+              contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+              systemInstruction: systemPrompt
+            });
+            return geminiResult.response.text();
           }
         } else {
           throw new Error(`Groq API returned ${response.status}: ${errObj?.error?.message || 'Unknown error'}`);
