@@ -104,3 +104,40 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ p
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ path: string[] }> }) {
+  try {
+    const session = await getSession();
+    if (!session.isLoggedIn) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const resolvedParams = await params;
+    const backendUrl = `${BACKEND_URL}/api/${resolvedParams.path.join("/")}`;
+    
+    // Copy headers and add Authorization
+    const headers = new Headers(request.headers);
+    headers.set("Authorization", `Bearer ${session.token}`);
+    headers.delete("host");
+
+    console.log(`[Proxy PATCH] Buffering raw request into ArrayBuffer...`);
+    const arrayBuffer = await request.arrayBuffer();
+
+    console.log(`[Proxy PATCH] Forwarding ${arrayBuffer.byteLength} bytes to ${backendUrl}`);
+    const res = await fetch(backendUrl, {
+      method: "PATCH",
+      headers,
+      body: arrayBuffer.byteLength > 0 ? arrayBuffer : undefined,
+    });
+
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error(`Backend did not return JSON. Status: ${res.status}, Body: ${text.substring(0, 50)}`);
+    }
+    return NextResponse.json(data, { status: res.status });
+  } catch (error: any) {
+    console.error("[Proxy PATCH Error]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
