@@ -14,6 +14,9 @@ import { checkEnv } from './lib/env-check';
 checkEnv();
 
 const app = express();
+// Trust the first proxy (Render's load balancer) so express-rate-limit correctly resolves X-Forwarded-For
+app.set('trust proxy', 1);
+
 const port = process.env.PORT || 3001;
 
 // Ensure uploads directory exists
