@@ -44,7 +44,9 @@
   }
 
   // If enabled, track dwell time ONLY on articles
-  if (isArticle) {
+  // Exclude pages that are explicitly video watching pages
+  const isVideoPage = window.location.pathname.includes('/watch') || window.location.pathname.includes('/video');
+  if (isArticle && !isVideoPage) {
     startDwellTracking();
   }
 
