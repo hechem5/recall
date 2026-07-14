@@ -1,7 +1,8 @@
 (async () => {
-  // Simple heuristic for an article
+  // Simple heuristic for an article or video
   const isArticle = !!document.querySelector('article') || document.body.innerText.split(/\s+/).length > 500;
-  if (!isArticle) return;
+  const isVideo = !!document.querySelector('video');
+  if (!isArticle && !isVideo) return;
 
   const getConsent = () => new Promise((resolve) => {
     chrome.runtime.sendMessage({ action: "getConsent" }, resolve);
@@ -11,7 +12,7 @@
     chrome.runtime.sendMessage({ action: "setConsent", enabled }, resolve);
   });
 
-  const { enabled, declined } = await getConsent();
+  const { enabled, declined, notifiedV2 } = await getConsent();
 
   if (declined) return; // User explicitly declined, do nothing
 
@@ -21,8 +22,15 @@
     return;
   }
 
-  // If enabled, track dwell time
-  startDwellTracking();
+  // They are enabled. Did they see the V2 notice?
+  if (!notifiedV2) {
+    showV2Notification();
+  }
+
+  // If enabled, track dwell time ONLY on articles
+  if (isArticle) {
+    startDwellTracking();
+  }
 
   function showConsentBanner() {
     if (document.getElementById('recall-consent-banner')) return;
@@ -47,7 +55,7 @@
     banner.innerHTML = `
       <div style="font-weight: bold; margin-bottom: 8px;">Recall: Enable Smart Saves?</div>
       <div style="font-size: 13px; margin-bottom: 12px; color: #a3a3a3;">
-        Allow Recall to track your time-on-page to suggest saving long articles you're reading.
+        Allow Recall to track your time-on-page and video-watch progress to suggest saving things you engage with.
       </div>
       <div style="display: flex; gap: 8px;">
         <button id="recall-consent-yes" style="background: #fafafa; color: #171717; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Enable</button>
@@ -60,12 +68,57 @@
     document.getElementById('recall-consent-yes').addEventListener('click', async () => {
       await setConsent(true);
       banner.remove();
-      startDwellTracking();
+      if (isArticle) startDwellTracking();
     });
 
     document.getElementById('recall-consent-no').addEventListener('click', async () => {
       await setConsent(false);
       banner.remove();
+    });
+  }
+
+  function showV2Notification() {
+    if (document.getElementById('recall-v2-notification')) return;
+
+    const notice = document.createElement('div');
+    notice.id = 'recall-v2-notification';
+    notice.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #171717;
+      color: #fafafa;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #262626;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 999999;
+      font-family: sans-serif;
+      max-width: 320px;
+    `;
+    
+    notice.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 8px;">Smart Saves Updated</div>
+      <div style="font-size: 13px; margin-bottom: 12px; color: #a3a3a3;">
+        Smart Saves now also tracks your video-watch progress (like YouTube) so you can resume later. You can turn this off anytime.
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="recall-v2-gotit" style="background: #fafafa; color: #171717; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Got it</button>
+        <button id="recall-v2-disable" style="background: transparent; color: #a3a3a3; border: 1px solid #404040; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Disable Smart Saves</button>
+      </div>
+    `;
+
+    document.body.appendChild(notice);
+
+    document.getElementById('recall-v2-gotit').addEventListener('click', () => {
+      chrome.runtime.sendMessage({ action: "setV2Notified" });
+      notice.remove();
+    });
+
+    document.getElementById('recall-v2-disable').addEventListener('click', async () => {
+      await setConsent(false);
+      notice.remove();
+      // Stop tracking immediately if we can (tracking is already started, so it will stop on next page load, but we can visually remove it)
     });
   }
 

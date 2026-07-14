@@ -93,10 +93,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 // Listener for the content script to check consent and show notifications
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getConsent") {
-    chrome.storage.local.get(['smartSaveEnabled', 'smartSaveDeclined'], (res) => {
+    chrome.storage.local.get(['smartSaveEnabled', 'smartSaveDeclined', 'smartSaveV2Notified'], (res) => {
       sendResponse({ 
         enabled: !!res.smartSaveEnabled, 
-        declined: !!res.smartSaveDeclined 
+        declined: !!res.smartSaveDeclined,
+        notifiedV2: !!res.smartSaveV2Notified
       });
     });
     return true; // Keep channel open for async response
@@ -105,8 +106,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "setConsent") {
     chrome.storage.local.set({ 
       smartSaveEnabled: request.enabled,
-      smartSaveDeclined: !request.enabled
+      smartSaveDeclined: !request.enabled,
+      smartSaveV2Notified: true // If they consent now, they are automatically on V2
     });
+    sendResponse({ success: true });
+    return true;
+  }
+  
+  if (request.action === "setV2Notified") {
+    chrome.storage.local.set({ smartSaveV2Notified: true });
     sendResponse({ success: true });
     return true;
   }
