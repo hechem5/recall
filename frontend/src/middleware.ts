@@ -5,9 +5,10 @@ import { getSession } from "@/lib/session";
 export async function middleware(request: NextRequest) {
   const session = await getSession();
 
-  // Allow access to the landing page, unlock page, and auth api for unauthenticated users
+  // Allow access to the landing page, unlock page, auth api, and the extension zip
   const isPublicRoute = 
     request.nextUrl.pathname === '/' || 
+    request.nextUrl.pathname === '/recall-extension.zip' ||
     request.nextUrl.pathname.startsWith('/unlock') || 
     request.nextUrl.pathname.startsWith('/api/auth');
 
