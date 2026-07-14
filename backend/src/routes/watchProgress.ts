@@ -103,7 +103,9 @@ router.post('/', async (req, res) => {
       if (favorites.length >= 2) {
         // Smart Replace: unfavorite the oldest
         const oldest = favorites[0];
-        await prisma.watchProgress.update({ where: { id: oldest.id }, data: { isFavorite: false } });
+        if (oldest) {
+          await prisma.watchProgress.update({ where: { id: oldest.id }, data: { isFavorite: false } });
+        }
       }
       isFavoriteVal = true;
     }
