@@ -13,9 +13,10 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const { apiUrl, appToken } = await chrome.storage.local.get(['apiUrl', 'appToken']);
+  const API_URL = "https://recall-fnvw.onrender.com";
+  const { appToken } = await chrome.storage.local.get(['appToken']);
   
-  if (!apiUrl || !appToken) {
+  if (!appToken) {
     console.error("Recall Extension not configured.");
     return;
   }
@@ -36,7 +37,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       };
     }
 
-    const res = await fetch(`${apiUrl}/api/ingest`, {
+    const res = await fetch(`${API_URL}/api/ingest`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

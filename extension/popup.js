@@ -15,12 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let config = null;
 
-  // Initialize
-  chrome.storage.local.get(['apiUrl', 'appToken'], (result) => {
-    if (!result.apiUrl || !result.appToken) {
+  const API_URL = "https://recall-fnvw.onrender.com";
+
+  // Check auth
+  chrome.storage.local.get(['appToken'], (result) => {
+    if (!result.appToken) {
       setupView.classList.remove('hidden');
     } else {
-      config = result;
+      config = { appToken: result.appToken };
       mainView.classList.remove('hidden');
       searchInput.focus();
     }
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab || !tab.url) throw new Error("Cannot access tab URL");
 
-      const res = await fetch(`${config.apiUrl}/api/ingest`, {
+      const res = await fetch(`${API_URL}/api/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingIndicator.classList.remove('hidden');
 
     try {
-      const res = await fetch(`${config.apiUrl}/api/search?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${config.appToken}`

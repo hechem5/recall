@@ -1,16 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('options-form');
-  const apiUrlInput = document.getElementById('apiUrl');
   const appPasswordInput = document.getElementById('appPassword');
   const statusMessage = document.getElementById('statusMessage');
 
+  const API_URL = "https://recall-fnvw.onrender.com";
+
   // Load existing settings
-  chrome.storage.local.get(['apiUrl', 'appPassword'], (result) => {
-    if (result.apiUrl) {
-      apiUrlInput.value = result.apiUrl;
-    } else {
-      apiUrlInput.value = 'http://localhost:3001';
-    }
+  chrome.storage.local.get(['appPassword'], (result) => {
     if (result.appPassword) {
       appPasswordInput.value = result.appPassword;
     }
@@ -20,11 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    let url = apiUrlInput.value.trim();
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1);
-    }
-
     const password = appPasswordInput.value.trim();
     const originalBtnText = e.submitter ? e.submitter.innerText : '[ Save Settings ]';
     
@@ -38,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const deviceId = result.visitorId;
 
       // Authenticate with backend
-      const res = await fetch(`${url}/auth/unlock`, {
+      const res = await fetch(`${API_URL}/auth/unlock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password, deviceId })
@@ -52,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Save token to extension storage
       chrome.storage.local.set({
-        apiUrl: url,
         appToken: data.token,
         appPassword: password // We can keep password if we want it to repopulate the field later
       }, () => {
