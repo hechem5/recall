@@ -153,6 +153,75 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep channel open
   }
 
+  if (request.action === "checkVideoStatus") {
+    (async () => {
+      const API_URL = "https://recall-fnvw.onrender.com";
+      const { appToken } = await chrome.storage.local.get(['appToken']);
+      if (!appToken) return sendResponse({ success: false });
+
+      const finalUrl = sender.tab && sender.tab.url ? sender.tab.url : request.url;
+      const finalTitle = sender.tab && sender.tab.title ? sender.tab.title : request.title;
+
+      try {
+        const res = await fetch(`${API_URL}/api/watch-progress/check-status`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${appToken}`
+          },
+          body: JSON.stringify({ url: finalUrl, title: finalTitle })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          // Tell the content script (in the active tab) what to do
+          if (sender.tab && sender.tab.id) {
+            chrome.tabs.sendMessage(sender.tab.id, {
+              action: "videoStatusResponse",
+              status: data.status,
+              url: finalUrl
+            });
+          }
+        }
+      } catch (e) {
+        // Ignore
+      }
+    })();
+    return true; // Keep channel open
+  }
+
+  if (request.action === "forceFavoriteWatchProgress") {
+    (async () => {
+      const API_URL = "https://recall-fnvw.onrender.com";
+      const { appToken } = await chrome.storage.local.get(['appToken']);
+      if (!appToken) return sendResponse({ success: false });
+
+      const finalUrl = sender.tab && sender.tab.url ? sender.tab.url : request.url;
+      const finalTitle = sender.tab && sender.tab.title ? sender.tab.title : request.title;
+
+      try {
+        const res = await fetch(`${API_URL}/api/watch-progress`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${appToken}`
+          },
+          body: JSON.stringify({
+            url: finalUrl,
+            title: finalTitle,
+            currentTime: 0,
+            duration: 1, // Will be overwritten by next real tick
+            forceFavorite: true
+          })
+        });
+        sendResponse({ success: res.ok });
+      } catch (e) {
+        sendResponse({ success: false });
+      }
+    })();
+    return true;
+  }
+
   if (request.action === "reportWatchProgress") {
     (async () => {
       const API_URL = "https://recall-fnvw.onrender.com";

@@ -207,4 +207,94 @@
       });
     }
   }
+
+  // Listener for background responses
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "videoStatusResponse") {
+      if (request.status === "auto_advanced") {
+        showAutoFavoriteToast();
+      } else if (request.status === "prompt_user") {
+        chrome.storage.local.get(['dismissedFavorites'], (res) => {
+          const dismissed = res.dismissedFavorites || [];
+          if (!dismissed.includes(window.location.hostname)) {
+            showNewFavoritePrompt();
+          }
+        });
+      }
+    }
+  });
+
+  function showAutoFavoriteToast() {
+    if (document.getElementById('recall-auto-fav-toast')) return;
+    const toast = document.createElement('div');
+    toast.id = 'recall-auto-fav-toast';
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #171717;
+      color: #FF3366;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #262626;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 999999;
+      font-family: sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      transition: opacity 0.5s;
+    `;
+    toast.innerHTML = `Auto-favorited next episode ✨`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
+
+  function showNewFavoritePrompt() {
+    if (document.getElementById('recall-new-fav-prompt')) return;
+    const prompt = document.createElement('div');
+    prompt.id = 'recall-new-fav-prompt';
+    prompt.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #171717;
+      color: #fafafa;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #262626;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 999999;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    `;
+    prompt.innerHTML = `
+      <div style="font-size: 14px;">Add to continue watching list?</div>
+      <div style="display: flex; gap: 8px;">
+        <button id="recall-fav-yes" style="background: #FF3366; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Favorite</button>
+        <button id="recall-fav-no" style="background: transparent; color: #a3a3a3; border: 1px solid #404040; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 13px;">Dismiss</button>
+      </div>
+    `;
+    document.body.appendChild(prompt);
+
+    document.getElementById('recall-fav-yes').addEventListener('click', () => {
+      prompt.innerHTML = '<div style="font-size: 14px; padding: 4px; color: #FF3366; font-weight: bold;">Added ✨</div>';
+      chrome.runtime.sendMessage({ action: "forceFavoriteWatchProgress" });
+      setTimeout(() => prompt.remove(), 2000);
+    });
+
+    document.getElementById('recall-fav-no').addEventListener('click', () => {
+      prompt.remove();
+      chrome.storage.local.get(['dismissedFavorites'], (res) => {
+        const arr = res.dismissedFavorites || [];
+        arr.push(window.location.hostname);
+        chrome.storage.local.set({ dismissedFavorites: arr });
+      });
+    });
+  }
+
 })();

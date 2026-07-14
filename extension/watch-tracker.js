@@ -1,6 +1,7 @@
 let trackingEnabled = false;
 let lastReportedTime = -1;
 let lastReportedUrl = "";
+let hasCheckedStatus = false;
 
 // Initialize consent
 chrome.runtime.sendMessage({ action: "getConsent" }, (response) => {
@@ -52,6 +53,22 @@ function reportProgress(video, force = false) {
 }
 
 function startWatchTracker() {
+  // Fast check for initial status to trigger popup or auto-advance
+  const initCheck = setInterval(() => {
+    const video = getBestVideo();
+    if (video && !video.paused && video.duration >= 300) {
+      if (!hasCheckedStatus) {
+        hasCheckedStatus = true;
+        chrome.runtime.sendMessage({
+          action: "checkVideoStatus",
+          url: window.location.href,
+          title: document.title
+        });
+      }
+      clearInterval(initCheck);
+    }
+  }, 2000);
+
   setInterval(() => {
     const video = getBestVideo();
     if (video && !video.paused) {

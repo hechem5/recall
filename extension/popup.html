@@ -71,11 +71,6 @@
       <button id="tabFileBtn" class="text-[#737373] hover:text-[#E5E5E5] transition-colors">[ File ]</button>
     </div>
 
-    <!-- Favorites View -->
-    <div id="favoritesContainer" class="flex flex-col space-y-2 pb-4 border-b border-[#262626] empty:hidden">
-      <!-- Injected by popup.js -->
-    </div>
-
     <!-- Search View -->
     <div id="searchContainer" class="flex flex-col space-y-4">
       <form id="searchForm" class="flex flex-col space-y-4">
@@ -98,6 +93,11 @@
 
       <div id="loadingIndicator" class="hidden text-xs text-[#737373] tracking-widest uppercase text-center animate-pulse mt-4">
         SEARCHING...
+      </div>
+
+      <!-- Favorites View -->
+      <div id="favoritesContainer" class="flex flex-col space-y-2 pt-4 border-t border-[#262626] empty:hidden">
+        <!-- Injected by popup.js -->
       </div>
     </div>
 
@@ -132,6 +132,8 @@
       
       <div class="text-xs font-bold text-[#737373] tracking-widest uppercase mt-4 border-t border-[#262626] pt-4">Sources</div>
       <div id="sourcesList" class="flex flex-col space-y-2"></div>
+    </div>
+
     </div>
 
     <!-- Manage Note -->

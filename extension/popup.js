@@ -61,12 +61,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      function formatTime(s) {
+        if (!s || isNaN(s)) return '00:00';
+        const m = Math.floor(s/60).toString().padStart(2, '0');
+        const sc = Math.floor(s%60).toString().padStart(2, '0');
+        return `${m}:${sc}`;
+      }
+
       let html = '';
       records.forEach(record => {
         const percent = Math.min(100, Math.max(0, record.percentComplete * 100));
+        let displayTitle = record.title || record.url;
+        // Strip leading site names like "Anikoto - " or "Site | "
+        if (record.title) {
+          displayTitle = record.title.replace(/^.*?(?:\s[-|]\s)/, '');
+        }
+
         html += `
           <a href="${record.url}" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-2 border border-[#262626] bg-[#0A0A0A] hover:border-[#404040] transition-colors decoration-transparent text-left relative">
-            <span class="text-xs font-bold text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors">${record.title || record.url}</span>
+            <span class="text-xs font-bold text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors">${displayTitle}</span>
+            <span class="text-[10px] text-[#737373] mt-1 tracking-widest">${formatTime(record.currentTime)} / ${formatTime(record.duration)}</span>
             <div class="w-full bg-[#262626] h-1 mt-2">
               <div class="bg-[#FF3366] h-full" style="width: ${percent}%"></div>
             </div>
