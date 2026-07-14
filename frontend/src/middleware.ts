@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // Allow access to the landing page, unlock page, auth api, and the extension zip
   const isPublicRoute = 
     request.nextUrl.pathname === '/' || 
-    request.nextUrl.pathname === '/recall-extension.zip' ||
+    request.nextUrl.pathname === '/recall-extension-v2.zip' ||
     request.nextUrl.pathname.startsWith('/unlock') || 
     request.nextUrl.pathname.startsWith('/api/auth');
 

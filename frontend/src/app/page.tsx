@@ -98,7 +98,7 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Add to Browser</h4>
               <p className="text-xs text-[#737373]">
-                <a href="/recall-extension.zip" download className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors underline underline-offset-4 decoration-[#FF3366]/30 hover:decoration-[#E5E5E5]">Download the Recall extension</a>
+                <a href="/recall-extension-v2.zip" download className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors underline underline-offset-4 decoration-[#FF3366]/30 hover:decoration-[#E5E5E5]">Download the Recall extension</a>
                 , open <span className="text-[#E5E5E5]">chrome://extensions</span>, enable "Developer mode", and drag the unzipped folder in.
               </p>
             </div>
