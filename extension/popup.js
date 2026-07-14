@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultsContainer = document.getElementById('resultsContainer');
   const answerContent = document.getElementById('answerContent');
   const sourcesList = document.getElementById('sourcesList');
+  const favoritesContainer = document.getElementById('favoritesContainer');
 
   let config = null;
 
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       config = { appToken: result.appToken };
       mainView.classList.remove('hidden');
       searchInput.focus();
+      loadFavorites();
     }
   });
 
@@ -38,6 +40,51 @@ document.addEventListener('DOMContentLoaded', () => {
     optionsBtn.addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
     });
+  }
+
+  // Load Favorites
+  async function loadFavorites() {
+    try {
+      const res = await fetch(`${API_URL}/api/watch-progress?favorites=true`, {
+        headers: { 'Authorization': `Bearer ${config.appToken}` }
+      });
+      if (!res.ok) throw new Error("Failed to load favorites");
+      
+      const records = await res.json();
+      
+      if (!records || records.length === 0) {
+        favoritesContainer.innerHTML = `
+          <div class="text-[10px] text-center text-[#737373] uppercase tracking-widest mt-2 p-2">
+            Star an item on your dashboard's Continue Watching list to see it here.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      records.forEach(record => {
+        const percent = Math.min(100, Math.max(0, record.percentComplete * 100));
+        html += `
+          <a href="${record.url}" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-2 border border-[#262626] bg-[#0A0A0A] hover:border-[#404040] transition-colors decoration-transparent text-left relative">
+            <span class="text-xs font-bold text-[#E5E5E5] group-hover:text-[#FF3366] truncate transition-colors">${record.title || record.url}</span>
+            <div class="w-full bg-[#262626] h-1 mt-2">
+              <div class="bg-[#FF3366] h-full" style="width: ${percent}%"></div>
+            </div>
+          </a>
+        `;
+      });
+      
+      html += `
+        <div class="text-[9px] text-[#737373] mt-1 text-center italic" title="Most streaming sites do not support seeking via URL">
+          *Opening these links will not automatically resume the player.
+        </div>
+      `;
+      
+      favoritesContainer.innerHTML = html;
+    } catch (err) {
+      console.error("Favorites error:", err);
+      favoritesContainer.innerHTML = '';
+    }
   }
 
   // Export Vault

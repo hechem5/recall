@@ -101,6 +101,7 @@ model WatchProgress {
   currentTime     Float
   duration        Float
   percentComplete Float
+  isFavorite      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

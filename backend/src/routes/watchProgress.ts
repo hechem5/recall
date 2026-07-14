@@ -56,9 +56,13 @@ router.get('/', async (req, res) => {
   try {
     const safeId = (req as any).user?.safeId;
     if (!safeId) return res.status(401).json({ error: 'Unauthorized' });
+    const isFavoritesOnly = req.query.favorites === 'true';
 
     const records = await prisma.watchProgress.findMany({
-      where: { safeId },
+      where: { 
+        safeId,
+        ...(isFavoritesOnly ? { isFavorite: true } : {})
+      },
       orderBy: { updatedAt: 'desc' },
       take: 20
     });
@@ -91,6 +95,48 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting watch progress:', error);
     return res.status(500).json({ error: 'Failed to delete watch progress' });
+  }
+});
+
+// PATCH /api/watch-progress/:id/favorite
+// Toggles the isFavorite status
+router.patch('/:id/favorite', async (req, res) => {
+  try {
+    const safeId = (req as any).user?.safeId;
+    if (!safeId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const id = req.params.id;
+    const { isFavorite } = req.body;
+
+    if (typeof isFavorite !== 'boolean') {
+      return res.status(400).json({ error: 'isFavorite must be a boolean' });
+    }
+
+    // Verify ownership
+    const record = await prisma.watchProgress.findUnique({ where: { id } });
+    if (!record || record.safeId !== safeId) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+
+    if (isFavorite) {
+      const favoriteCount = await prisma.watchProgress.count({
+        where: { safeId, isFavorite: true }
+      });
+      
+      if (favoriteCount >= 2 && !record.isFavorite) {
+        return res.status(409).json({ error: 'Maximum 2 favorites. Unfavorite one first.' });
+      }
+    }
+
+    const updated = await prisma.watchProgress.update({
+      where: { id },
+      data: { isFavorite }
+    });
+    
+    return res.json(updated);
+  } catch (error) {
+    console.error('Error toggling favorite status:', error);
+    return res.status(500).json({ error: 'Failed to toggle favorite status' });
   }
 });
 
