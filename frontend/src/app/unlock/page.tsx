@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import fpPromise from '@fingerprintjs/fingerprintjs';
 
+import Link from 'next/link';
+
 export default function UnlockPage() {
   const [password, setPassword] = useState('');
   const [deviceId, setDeviceId] = useState('');
@@ -47,8 +49,12 @@ export default function UnlockPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center justify-center font-mono">
+    <main className="min-h-screen bg-black text-[#E5E5E5] p-8 md:p-16 flex flex-col items-center justify-center font-mono relative">
       
+      <Link href="/" className="absolute top-8 left-8 text-[#737373] hover:text-[#FF3366] transition-colors flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
+        ← BACK TO HOME
+      </Link>
+
       <div className="w-full max-w-lg flex flex-col items-center">
         {/* Header */}
         <div className="w-full border-b border-[#262626] pb-4 mb-12 text-center">

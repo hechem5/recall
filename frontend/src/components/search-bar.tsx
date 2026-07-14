@@ -71,10 +71,9 @@ export function SearchBar() {
             <div className="text-xs font-bold text-[#FF3366] tracking-widest uppercase">
               Answer
             </div>
-            <div className="prose prose-invert max-w-none text-[#E5E5E5] leading-relaxed prose-a:text-[#FF3366] prose-a:no-underline hover:prose-a:underline">
+            <div className="prose prose-invert max-w-none text-[#E5E5E5] leading-relaxed prose-a:text-[#FF3366] prose-a:no-underline hover:prose-a:underline bg-[#111111] border border-[#262626] border-l-4 border-l-[#FF3366] p-6 md:p-8">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {result.answer
-                  .replace(/[ \t]*\[(?:Sources?\s*)?[\d,\s]+\]/g, "")}
+                {result.answer}
               </ReactMarkdown>
             </div>
           </div>

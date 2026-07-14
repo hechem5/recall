@@ -100,17 +100,9 @@ export default function LandingPage() {
               <p className="text-xs text-[#737373]">Download the Recall extension folder, open <span className="text-[#E5E5E5]">chrome://extensions</span>, enable "Developer mode", and load the folder.</p>
             </div>
           </div>
-          
-          <div className="flex gap-6">
-            <div className="text-[#262626] font-bold text-xl">02</div>
-            <div>
-              <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Link Your Safe</h4>
-              <p className="text-xs text-[#737373]">Right-click the Recall icon, open Options, and paste your personal server link (e.g., your Render URL).</p>
-            </div>
-          </div>
 
           <div className="flex gap-6">
-            <div className="text-[#262626] font-bold text-xl">03</div>
+            <div className="text-[#262626] font-bold text-xl">02</div>
             <div>
               <h4 className="text-sm font-bold tracking-widest uppercase mb-2">Secure Access</h4>
               <p className="text-xs text-[#737373]">Type your vault password. Your browser is now cryptographically locked to your safe and ready to save memories with one click.</p>
@@ -121,7 +113,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-[#262626] p-6 text-center text-xs text-[#404040] tracking-widest uppercase">
-        SYSTEM ONLINE // ENCRYPTION ACTIVE // RECALL_ 2026
+        MADE BY HECHEM KLAI AND <a href="https://www.linkedin.com/in/hechem-klai/" target="_blank" rel="noopener noreferrer" className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors">LINKEDIN</a>
       </footer>
 
     </main>
