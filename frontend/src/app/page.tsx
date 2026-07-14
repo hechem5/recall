@@ -119,6 +119,8 @@ export default function LandingPage() {
         <span>MADE BY HECHEM KLAI</span>
         <span>//</span>
         <a href="https://www.linkedin.com/in/hechem-klai/" target="_blank" rel="noopener noreferrer" className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors">LINKEDIN</a>
+        <span>//</span>
+        <a href="https://github.com/hechem5" target="_blank" rel="noopener noreferrer" className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors">GITHUB</a>
       </footer>
 
     </main>
