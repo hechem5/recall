@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DemoSearch } from '@/components/demo-search';
 
 export default function LandingPage() {
   return (
@@ -18,76 +19,91 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="px-6 py-24 md:py-32 max-w-4xl mx-auto flex flex-col items-start border-l border-[#262626] ml-6 md:ml-12 pl-6 md:pl-12">
-        <div className="text-xs font-bold tracking-widest uppercase text-[#FF3366] mb-8 flex items-center gap-4">
-          <span className="w-8 h-[1px] bg-[#FF3366]"></span>
-          System Initialization
-        </div>
-        
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none mb-8">
-          Total<br />
-          Information<br />
-          <span className="text-[#737373]">Retrieval.</span>
-        </h1>
-        
-        <p className="max-w-xl text-sm md:text-base text-[#A3A3A3] leading-relaxed mb-12">
-          RECALL is a locally bound, cryptographically secured memory extension. Save articles, 
-          PDFs, and text snippets instantly via the browser extension, and retrieve them via 
-          semantic vector search.
-        </p>
+      <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-12 border-l border-[#262626] ml-6 md:ml-12 pl-6 md:pl-12">
+        <div className="flex-1 flex flex-col items-start">
+          <div className="text-xs font-bold tracking-widest uppercase text-[#FF3366] mb-8 flex items-center gap-4">
+            <span className="w-8 h-[1px] bg-[#FF3366]"></span>
+            Personal Memory Extension
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none mb-8">
+            Never lose<br />
+            information<br />
+            <span className="text-[#737373]">again.</span>
+          </h1>
+          
+          <p className="max-w-xl text-sm md:text-base text-[#A3A3A3] leading-relaxed mb-12">
+            Recall is a cryptographically secure memory extension built directly into your browser. 
+            It is not a note-taking app—it is a perfect recall of everything you've ever read. 
+            Save instantly, ask questions naturally, and let the AI synthesize the answers with exact citations.
+          </p>
 
-        <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
-          <Link 
-            href="/unlock"
-            className="w-full bg-[#FF3366] hover:bg-[#E5E5E5] text-black text-center text-xs font-bold tracking-widest uppercase py-4 transition-colors"
-          >
-            INITIATE SAFE
-          </Link>
-          <a 
-            href="#extension"
-            className="w-full border border-[#262626] hover:border-[#FF3366] text-[#E5E5E5] text-center text-xs font-bold tracking-widest uppercase py-4 transition-colors hover:text-[#FF3366]"
-          >
-            GET EXTENSION
-          </a>
+          <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
+            <Link 
+              href="/unlock"
+              className="w-full bg-[#FF3366] hover:bg-[#E5E5E5] text-black text-center text-xs font-bold tracking-widest uppercase py-4 transition-colors"
+            >
+              INITIATE SAFE
+            </Link>
+            <a 
+              href="#extension"
+              className="w-full border border-[#262626] hover:border-[#FF3366] text-[#E5E5E5] text-center text-xs font-bold tracking-widest uppercase py-4 transition-colors hover:text-[#FF3366]"
+            >
+              GET EXTENSION
+            </a>
+          </div>
+        </div>
+
+        <div className="flex-1 w-full flex justify-center md:justify-end mt-12 md:mt-0 relative z-10">
+          <DemoSearch />
         </div>
       </section>
 
-      {/* Features */}
+      {/* Workflow (Replacing Technical Features) */}
       <section className="border-y border-[#262626] bg-[#0A0A0A]">
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#262626]">
           
-          <div className="p-12 hover:bg-[#111111] transition-colors">
+          <div className="p-12 hover:bg-[#111111] transition-colors flex flex-col">
             <div className="text-[#FF3366] font-bold text-2xl mb-6">01.</div>
-            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Hardware Bound</h3>
+            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Save</h3>
             <p className="text-xs text-[#737373] leading-relaxed">
-              Your vault generates a unique cryptographic signature based on your physical device. 
-              Even with the correct password, access is denied from unrecognized hardware.
+              Find something interesting? One click in the browser extension instantly archives the entire article, document, or snippet to your vault without breaking your workflow.
             </p>
           </div>
 
-          <div className="p-12 hover:bg-[#111111] transition-colors">
+          <div className="p-12 hover:bg-[#111111] transition-colors flex flex-col">
             <div className="text-[#FF3366] font-bold text-2xl mb-6">02.</div>
-            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Semantic Search</h3>
+            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Ask</h3>
             <p className="text-xs text-[#737373] leading-relaxed">
-              Data is automatically chunked and embedded. Search not just for keywords, but for 
-              meaning, concepts, and ideas. Recall instantly understands the context of your query.
+              Months later, don't waste time searching for keywords. Just ask your vault a natural question like "What was that article explaining RAG pipelines?"
             </p>
           </div>
 
-          <div className="p-12 hover:bg-[#111111] transition-colors">
+          <div className="p-12 hover:bg-[#111111] transition-colors flex flex-col">
             <div className="text-[#FF3366] font-bold text-2xl mb-6">03.</div>
-            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">AI Synthesis</h3>
+            <h3 className="text-lg font-bold tracking-widest uppercase mb-4">Remember</h3>
             <p className="text-xs text-[#737373] leading-relaxed">
-              Queries don't just return links. An integrated language model synthesizes the exact 
-              answer directly from your saved sources, complete with citations.
+              Recall reads through your archived memories and synthesizes a direct, accurate answer complete with source citations linking back to your original files.
             </p>
           </div>
 
         </div>
       </section>
 
+      {/* Trust & Privacy Section */}
+      <section className="px-6 py-24 md:py-32 max-w-4xl mx-auto border-l border-[#262626] ml-6 md:ml-12 pl-6 md:pl-12">
+        <h2 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase mb-8">
+          Trust & Privacy<span className="text-[#FF3366]">_</span>
+        </h2>
+        <p className="max-w-2xl text-sm md:text-base text-[#A3A3A3] leading-relaxed">
+          Recall is designed for remembering knowledge, not just storing files in a generic cloud drive. 
+          To ensure absolute privacy, your vault generates a unique cryptographic signature based on your physical hardware. 
+          Even with the correct password, your memories cannot be accessed from an unrecognized device.
+        </p>
+      </section>
+
       {/* Extension Setup */}
-      <section id="extension" className="p-12 md:p-24 max-w-4xl mx-auto border-l border-[#262626] ml-6 md:ml-12 pl-6 md:pl-12 mt-12 mb-24">
+      <section id="extension" className="p-12 md:p-24 max-w-4xl mx-auto border-l border-[#262626] ml-6 md:ml-12 pl-6 md:pl-12 mb-24 border-t border-[#262626]">
         <h2 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase mb-12">
           Extension<br/>Integration<span className="text-[#FF3366]">_</span>
         </h2>
