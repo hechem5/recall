@@ -1,18 +1,15 @@
-export async function synthesizeAnswer(
-  query: string,
-  sources: { content: string; title?: string | null; url?: string | null; type?: string | null; savedAt?: string | undefined; isRecent?: boolean | undefined }[]
-): Promise<string> {
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-  // Build context from unified sources
-  const contextBlock = sources.map((c, i) => {
-    const meta = [
-      c.title ? `Title: ${c.title}` : '',
-      c.url ? `URL: ${c.url}` : '',
-      c.type ? `Type: ${c.type}` : '',
-      c.savedAt ? `Saved: ${c.savedAt}` : '',
-      c.isRecent ? `(RECENTLY SAVED)` : ''
-    ].filter(Boolean).join(' | ');
-    return `[Source ${i + 1}]${meta ? ` (${meta})` : ''}\n${c.content}`;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+export async function synthesizeAnswer(query: string, contextChunks: { sourceId: string, content: string, title?: string, url?: string, savedAt?: string, isRecent?: boolean }[]): Promise<string> {
+  const contextBlock = contextChunks.map((c, i) => {
+    let text = `[${i + 1}] Source: ${c.title || c.url || 'Unknown'}`;
+    if (c.savedAt) text += ` (Saved: ${c.savedAt})`;
+    if (c.isRecent) text += ` (RECENTLY SAVED)`;
+    text += `\nContent:\n${c.content}`;
+    return text;
   }).join('\n\n---\n\n');
 
   const systemPrompt = `You are Recall — a private, personal memory assistant. Your ONLY job is to answer questions using the user's saved memory items shown below.
@@ -34,59 +31,13 @@ ${contextBlock}
 
 Answer the question using ONLY the memories above. Remember: If you find the answer, state it directly without any preamble. If it's missing entirely, say exactly: "I don't have that saved in your memory."`;
 
-  const modelsToTry = [
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "google/gemini-2.0-pro-exp-02-05:free",
-    "deepseek/deepseek-chat:free",
-    "openrouter/auto"
-  ];
-
-  let lastError = null;
-
-  for (const model of modelsToTry) {
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "Recall Semantic Search",
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
-          ],
-          temperature: 0,
-          max_tokens: 800,
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.warn(`[Synthesis] Model ${model} failed with ${response.status}:`, errorText);
-        lastError = new Error(`OpenRouter API failed with status: ${response.status}`);
-        
-        // Try the next model for ANY API error (429, 500, 502, 404, etc)
-        continue;
-      }
-
-      const data = await response.json();
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        return data.choices[0].message.content;
-      }
-      
-      return "Could not synthesize an answer.";
-    } catch (error) {
-      lastError = error;
-      // If it's a fetch error (network), try the next model. 
-      // If it's a thrown error (like a 500), the loop will continue.
-      console.warn(`[Synthesis] Network error on model ${model}:`, error);
-    }
+  try {
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] }]
+    });
+    return result.response.text();
+  } catch (error) {
+    console.error("[Synthesis] Gemini synthesis failed:", error);
+    throw new Error("Failed to synthesize answer");
   }
-
-  console.error("Synthesis error: All fallback models failed. Last error:", lastError);
-  throw lastError;
 }
