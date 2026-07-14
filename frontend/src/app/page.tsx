@@ -112,8 +112,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#262626] p-6 text-center text-xs text-[#404040] tracking-widest uppercase">
-        MADE BY HECHEM KLAI AND <a href="https://www.linkedin.com/in/hechem-klai/" target="_blank" rel="noopener noreferrer" className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors">LINKEDIN</a>
+      <footer className="border-t border-[#262626] p-6 text-center text-xs text-[#404040] tracking-widest uppercase flex justify-center items-center gap-4">
+        <span>MADE BY HECHEM KLAI</span>
+        <span>//</span>
+        <a href="https://www.linkedin.com/in/hechem-klai/" target="_blank" rel="noopener noreferrer" className="text-[#FF3366] hover:text-[#E5E5E5] transition-colors">LINKEDIN</a>
       </footer>
 
     </main>
