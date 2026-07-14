@@ -58,12 +58,21 @@
       </div>
 
       <div class="flex items-center justify-between pt-4">
-        <button 
-          type="submit" 
-          class="text-sm font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
-        >
-          [ Save Settings ]
-        </button>
+        <div class="flex gap-4">
+          <button 
+            type="submit" 
+            class="text-sm font-bold tracking-widest uppercase text-[#737373] hover:text-[#FF3366] transition-colors"
+          >
+            [ Save Settings ]
+          </button>
+          <button 
+            type="button" 
+            id="create-new-btn"
+            class="text-sm font-bold tracking-widest uppercase text-[#737373] hover:text-[#E5E5E5] transition-colors"
+          >
+            [ Create New ]
+          </button>
+        </div>
         <span id="statusMessage" class="text-xs text-[#FF3366] tracking-widest uppercase hidden">
           Settings Saved!
         </span>
@@ -71,7 +80,46 @@
     </form>
   </div>
 
-  <script src="fp.min.js"></script>
+  <!-- Recovery Codes Modal -->
+  <div id="recoveryCodesModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center p-8 backdrop-blur-sm">
+    <div class="max-w-2xl w-full bg-[#111111] border border-[#FF3366] p-8 md:p-12 space-y-8">
+      <div class="border-b border-[#FF3366]/30 pb-4">
+        <h2 class="text-2xl font-bold tracking-widest text-[#FF3366] uppercase">Critical: Save Recovery Codes</h2>
+        <p class="text-[#A3A3A3] text-sm mt-2">
+          Your vault is locked to this specific browser extension. If you lose access or uninstall the extension, you MUST use one of these one-time recovery codes to regain access.
+        </p>
+        <p class="text-[#E5E5E5] font-bold text-sm mt-2 uppercase tracking-widest">
+          These will never be shown again.
+        </p>
+      </div>
+
+      <div id="recoveryCodesList" class="grid grid-cols-2 gap-4">
+        <!-- Codes injected here via JS -->
+      </div>
+
+      <div class="pt-4 border-t border-[#262626] space-y-6">
+        <label class="flex items-start gap-4 cursor-pointer group">
+          <input 
+            type="checkbox" 
+            id="savedConfirmed"
+            class="mt-1 w-4 h-4 bg-transparent border border-[#737373] checked:bg-[#FF3366] appearance-none cursor-pointer"
+          />
+          <span class="text-sm tracking-widest uppercase text-[#737373] group-hover:text-[#E5E5E5] transition-colors">
+            I confirm that I have securely saved these recovery codes.
+          </span>
+        </label>
+
+        <button 
+          id="proceedModalBtn"
+          disabled
+          class="w-full bg-[#FF3366] text-black font-bold tracking-widest uppercase py-4 disabled:opacity-50 disabled:bg-[#262626] disabled:text-[#737373] transition-colors"
+        >
+          [ PROCEED ]
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="options.js"></script>
 </body>
 </html>
