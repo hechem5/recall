@@ -5,14 +5,14 @@ import { Search, Loader2 } from "lucide-react";
 
 const DEMO_QUERIES = [
   {
-    query: "What was that article explaining RAG pipelines?",
-    answer: "RAG (Retrieval-Augmented Generation) pipelines combine information retrieval with a text generator model. They work by first fetching relevant documents from a vector database based on semantic similarity, and then passing those documents as context to an LLM to generate a precise, grounded answer [1].",
-    sources: [{ title: "The Definitive Guide to RAG", url: "#" }]
+    query: "What was the link that compared Next.js vs Vite performance?",
+    answer: "The article you saved yesterday compared Next.js and Vite. It concluded that Vite is significantly faster for local development due to native ES modules, while Next.js excels in production for server-side rendered applications [1].",
+    sources: [{ title: "Frontend Framework Performance Showdown", url: "#" }]
   },
   {
-    query: "How did I configure the Nginx reverse proxy?",
-    answer: "You configured the Nginx reverse proxy by setting up a `server` block listening on port 80, using `proxy_pass http://localhost:3000;` to forward traffic to the frontend, and explicitly setting the `Host` and `X-Forwarded-For` headers to ensure the application received the correct client IP addresses [1].",
-    sources: [{ title: "Server Setup Notes.txt", url: "#" }]
+    query: "Which PDF contains my tax documents for 2024?",
+    answer: "Your 2024 tax documents are located in the file you uploaded last week. Specifically, your W2 and 1099 forms are combined in the second section [1].",
+    sources: [{ title: "2024_Tax_Returns_Final.pdf", url: "#" }]
   }
 ];
 
