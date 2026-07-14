@@ -55,11 +55,11 @@ app.use('/api', (req, res, next) => {
     return res.status(401).json({ error: 'Missing or invalid authorization header' });
   }
 
-  const token = authHeader.split(' ')[1];
-  const JWT_SECRET = process.env.SESSION_SECRET || "fallback-secret-key-for-jwt";
+  const token = authHeader.split(' ')[1] as string;
+  const JWT_SECRET = (process.env.SESSION_SECRET as string) || "fallback-secret-key-for-jwt";
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { safeId: string, deviceId: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as unknown as { safeId: string, deviceId: string };
     // @ts-ignore - inject user info into request
     req.user = decoded;
     next();

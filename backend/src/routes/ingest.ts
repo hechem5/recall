@@ -26,9 +26,9 @@ async function ingestText(safeId: string, type: string, content: string, title?:
   if (tags && tags.length > 0) {
     for (const tagName of tags) {
       const tag = await prisma.tag.upsert({
-        where: { name: tagName },
+        where: { safeId_name: { safeId, name: tagName } },
         update: {},
-        create: { name: tagName }
+        create: { safeId, name: tagName }
       });
       await prisma.sourceTag.create({
         data: { sourceId: source.id, tagId: tag.id }

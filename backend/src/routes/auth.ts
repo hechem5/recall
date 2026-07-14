@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import prisma from "../db";
+import prisma from "../prisma";
 
 const router = Router();
 const JWT_SECRET = process.env.SESSION_SECRET || "fallback-secret-key-for-jwt";
