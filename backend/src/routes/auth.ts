@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import prisma from "../prisma";
+import { signToken, verifyToken } from "../lib/jwt";
 
 const router = Router();
-const JWT_SECRET = process.env.SESSION_SECRET || "fallback-secret-key-for-jwt";
 
 // Global IP-based rate limiter for the recovery code path
 const recoveryLimiter = rateLimit({
@@ -17,6 +17,23 @@ const recoveryLimiter = rateLimit({
     // Skip rate limiting if they aren't trying to use a recovery code
     return !req.body.recoveryCode;
   }
+});
+
+// IP + Device Token composite rate limiter to prevent NAT lockouts
+const unlockIpDeviceLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 attempts
+  keyGenerator: (req) => `${req.ip}_${req.body.deviceToken || 'no-device'}`,
+  message: { error: "Too many login attempts. For your security, please wait 15 minutes before trying again." }
+});
+
+// Strict Account/Device rate limiter to prevent IP rotation brute-forcing
+const unlockAccountLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 20, // 20 attempts
+  keyGenerator: (req) => req.body.deviceToken || req.body.recoveryCode || 'unknown',
+  message: { error: "Too many login attempts on this device. Please wait 30 minutes." },
+  skip: (req) => !req.body.deviceToken && !req.body.recoveryCode
 });
 
 const generateRandomCode = () => {
@@ -55,7 +72,7 @@ router.post("/create-safe", async (req, res) => {
     }
     await Promise.all(codePromises);
 
-    const token = jwt.sign({ safeId: safe.id }, JWT_SECRET, { expiresIn: '30d' });
+    const token = signToken({ safeId: safe.id }, '30d');
     res.json({ token, safeId: safe.id, deviceToken, recoveryCodes: plainCodes });
   } catch (error) {
     console.error("Create safe error:", error);
@@ -63,7 +80,7 @@ router.post("/create-safe", async (req, res) => {
   }
 });
 
-router.post("/unlock", recoveryLimiter, async (req, res) => {
+router.post("/unlock", recoveryLimiter, unlockIpDeviceLimiter, unlockAccountLimiter, async (req, res) => {
   try {
     const { password, deviceToken, recoveryCode } = req.body;
 
@@ -133,7 +150,7 @@ router.post("/unlock", recoveryLimiter, async (req, res) => {
       where: { safeId: safe.id, used: false }
     });
 
-    const token = jwt.sign({ safeId: safe.id }, JWT_SECRET, { expiresIn: '30d' });
+    const token = signToken({ safeId: safe.id }, '30d');
     res.json({ 
       token, 
       safeId: safe.id, 
@@ -156,7 +173,7 @@ router.post("/regenerate-recovery-codes", async (req, res) => {
     }
 
     const token = authHeader.split(' ')[1] as string;
-    const decoded = jwt.verify(token, JWT_SECRET as string) as unknown as { safeId: string };
+    const decoded = verifyToken(token) as unknown as { safeId: string };
     const safeId = decoded.safeId;
 
     // Delete unused codes

@@ -82,4 +82,32 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Record an access to update the lastAccessedAt timestamp
+router.post('/:id/access', async (req, res) => {
+  try {
+    const safeId = (req as any).user?.safeId;
+    if (!safeId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const id = req.params.id;
+
+    const source = await prisma.source.findFirst({
+      where: { id, safeId }
+    });
+
+    if (!source) {
+      return res.status(404).json({ error: 'Memory not found or unauthorized' });
+    }
+
+    await prisma.source.update({
+      where: { id },
+      data: { lastAccessedAt: new Date() }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update access error:', error);
+    res.status(500).json({ error: 'Failed to update access time' });
+  }
+});
+
 export default router;

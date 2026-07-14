@@ -29,8 +29,17 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // Allow localhost or any other origin (for now, keeping it permissive but explicit)
-    return callback(null, true);
+    // Restrict to explicitly allowed origins from environment
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    if (allowedOrigins.length > 0 && allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('CORS not allowed for this origin'), false);
   }
 }));
 app.use(express.json());
@@ -41,7 +50,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-import jwt from 'jsonwebtoken';
+import { verifyToken } from './lib/jwt';
 
 app.use('/auth', authRouter);
 
@@ -56,10 +65,9 @@ app.use('/api', (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1] as string;
-  const JWT_SECRET = (process.env.SESSION_SECRET as string) || "fallback-secret-key-for-jwt";
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as unknown as { safeId: string, deviceId: string };
+    const decoded = verifyToken(token) as unknown as { safeId: string, deviceId: string };
     // @ts-ignore - inject user info into request
     req.user = decoded;
     next();

@@ -26,9 +26,12 @@
     "storage",
     "scripting"
   ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
+  "host_permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
   ],
   "background": {
     "service_worker": "background.js"

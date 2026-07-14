@@ -47,13 +47,31 @@ router.post('/weekly-digest', async (req, res) => {
         })
       });
 
+      const ORPHAN_DAYS = parseInt(process.env.ORPHAN_DAYS_THRESHOLD || '90', 10);
+      const MIN_SOURCES = parseInt(process.env.ORPHAN_MIN_SOURCE_COUNT || '20', 10);
+      
+      const totalSources = await prisma.source.count({ where: { safeId: safe.id } });
+      let orphanedSourceIds: string[] = [];
+
+      if (totalSources >= MIN_SOURCES) {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - ORPHAN_DAYS);
+        const orphans = await prisma.source.findMany({
+          where: { safeId: safe.id, lastAccessedAt: { lt: cutoff } },
+          select: { id: true },
+          take: 10
+        });
+        orphanedSourceIds = orphans.map(o => o.id);
+      }
+
       if (response.ok) {
         const data = await response.json();
         if (data.choices && data.choices[0] && data.choices[0].message) {
           await prisma.digest.create({
             data: {
               content: data.choices[0].message.content,
-              safeId: safe.id
+              safeId: safe.id,
+              orphanedSourceIds: JSON.stringify(orphanedSourceIds)
             }
           });
           createdCount++;
@@ -77,7 +95,26 @@ router.get('/digests', async (req, res) => {
       where: { safeId },
       orderBy: { createdAt: 'desc' }
     });
-    return res.json({ digests });
+
+    const enrichedDigests = await Promise.all(digests.map(async (digest) => {
+      let orphanedSources = [];
+      if (digest.orphanedSourceIds) {
+        try {
+          const ids = JSON.parse(digest.orphanedSourceIds);
+          if (Array.isArray(ids) && ids.length > 0) {
+            orphanedSources = await prisma.source.findMany({
+              where: { id: { in: ids }, safeId },
+              select: { id: true, title: true, type: true, createdAt: true, originalUrl: true }
+            });
+          }
+        } catch (e) {
+          console.error("Failed to parse orphanedSourceIds", e);
+        }
+      }
+      return { ...digest, orphanedSources };
+    }));
+
+    return res.json({ digests: enrichedDigests });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch digests' });
   }
