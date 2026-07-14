@@ -20,6 +20,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ path
     // Create new headers to pass back the content type and length
     const responseHeaders = new Headers(res.headers);
     
+    // Node's fetch automatically decompresses the response body.
+    // If we pass the backend's "Content-Encoding: gzip" header to the browser,
+    // the browser will try to double-decompress the raw JSON stream and fail with ERR_CONTENT_DECODING_FAILED.
+    responseHeaders.delete('content-encoding');
+    responseHeaders.delete('content-length');
+    
     // Instead of forcing JSON parse, just stream the raw body back
     return new NextResponse(res.body, {
       status: res.status,
