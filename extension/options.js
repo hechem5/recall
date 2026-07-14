@@ -28,14 +28,29 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDeviceToken = null;
 
   // Load existing settings
-  chrome.storage.local.get(['appPassword', 'deviceToken'], (result) => {
+  chrome.storage.local.get(['appToken', 'appPassword', 'deviceToken'], (result) => {
     if (result.appPassword) {
       appPasswordInput.value = result.appPassword;
     }
     if (result.deviceToken) {
       currentDeviceToken = result.deviceToken;
     }
+    if (result.appToken) {
+      // Already logged in, show success screen
+      form.classList.add('hidden');
+      document.getElementById('successScreen').classList.remove('hidden');
+      document.getElementById('successScreen').classList.add('flex');
+    }
   });
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      chrome.storage.local.clear(() => {
+        window.location.reload();
+      });
+    });
+  }
 
   const showStatus = (msg, isError = false) => {
     statusMessage.innerText = msg;
