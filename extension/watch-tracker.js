@@ -2,6 +2,7 @@ let trackingEnabled = false;
 let lastReportedTime = -1;
 let lastReportedUrl = "";
 let hasCheckedStatus = false;
+let currentTrackedUrl = "";
 
 // Initialize consent
 chrome.runtime.sendMessage({ action: "getConsent" }, (response) => {
@@ -53,10 +54,14 @@ function reportProgress(video, force = false) {
 }
 
 function startWatchTracker() {
-  // Fast check for initial status to trigger popup or auto-advance
-  const initCheck = setInterval(() => {
+  setInterval(() => {
     const video = getBestVideo();
     if (video && !video.paused && video.duration >= 300) {
+      if (window.location.href !== currentTrackedUrl) {
+        currentTrackedUrl = window.location.href;
+        hasCheckedStatus = false;
+      }
+
       if (!hasCheckedStatus) {
         hasCheckedStatus = true;
         chrome.runtime.sendMessage({
@@ -65,16 +70,10 @@ function startWatchTracker() {
           title: document.title
         });
       }
-      clearInterval(initCheck);
-    }
-  }, 2000);
 
-  setInterval(() => {
-    const video = getBestVideo();
-    if (video && !video.paused) {
       reportProgress(video, false);
     }
-  }, 15000); // Poll every 15s
+  }, 2000);
 
   // Ensure we capture final state before user leaves
   document.addEventListener("visibilitychange", () => {
