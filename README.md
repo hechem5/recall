@@ -73,8 +73,18 @@ The fastest way to get information into your vault without disrupting your workf
 * **Why it's there:** When you don't need the entire article, you can selectively save exact quotes. It captures the text and binds it to the exact source URL for perfect citations.
 
 ### 6. Smart Saves & Auto-Advance Handoff
-* **What it is:** An intelligent opt-in tracker that runs quietly in the background. It dynamically polls for video players to track your exact watch progress, and uses smart heuristics to auto-advance your pinned shows. If you finish an episode and click "Next Episode", the tracker automatically detects the transition, unfavorites the old episode, and pins the new one without a single click.
-* **Why it's there:** To completely automate remembering your place across the internet. It prevents tab hoarding and acts as a completely seamless, hands-free video tracker.
+* **What it is:** An intelligent opt-in tracker that runs quietly in the background. For articles, it tracks your dwell-time and scroll depth to auto-prompt you to save long reads. For video players (YouTube, Anime), it tracks your exact watch progress and uses smart heuristics to auto-advance your pinned shows. If you finish an episode and click "Next Episode", the tracker automatically detects the transition, unfavorites the old episode, and pins the new one without a single click.
+* **Why it's there:** To completely automate remembering your place across the internet. It prevents tab hoarding and acts as a completely seamless, hands-free media tracker.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** Next.js 14 (App Router), React, TailwindCSS, Lucide Icons.
+* **Backend:** Node.js, Express.js, Prisma ORM, JSON Web Tokens (JWT).
+* **Database:** PostgreSQL (or SQLite for local dev).
+* **AI & Embeddings:** Google Gemini AI (for semantic synthesis and document embedding).
+* **Extension:** Manifest V3 Chrome Extension API (vanilla JS/HTML/CSS for maximum performance).
 
 ---
 
