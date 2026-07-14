@@ -15,10 +15,13 @@ export async function splitText(text: string): Promise<string[]> {
 }
 
 export async function embedText(text: string): Promise<number[]> {
-  const result = await model.embedContent({
-    content: { role: "user", parts: [{ text }] }
+  const result = await model.batchEmbedContents({
+    requests: [{
+      content: { role: "user", parts: [{ text }] },
+      outputDimensionality: 768
+    }]
   });
-  return result.embedding.values;
+  return result.embeddings[0].values;
 }
 
 export async function embedTexts(texts: string[]): Promise<number[][]> {
